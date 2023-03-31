@@ -8,6 +8,12 @@ project(Lorraine)
 # Locate LLVM package
 find_package(LLVM CONFIG REQUIRED)
 
+# Locate Bison package
+find_package(BISON)
+
+# Locate Flex package
+find_package(FLEX)
+
 # Include LLVM includes and definitions
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
