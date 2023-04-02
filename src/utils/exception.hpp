@@ -7,13 +7,13 @@
 
 namespace lorraine::utils
 {
-    /// @brief Lorraine compiler exception class. Represents where an error during compilation could
-    /// have occurred.
-    struct compiler_exception : std::runtime_error
+    /// @brief Lorraine syntax exception class. Is thrown when an unexpected error during
+    /// syntax parsing occurs.
+    struct syntax_exception : std::runtime_error
     {
-        location location;
+        utils::location location;
 
-        explicit compiler_exception( utils::location location, const std::string& msg )
+        explicit syntax_exception( utils::location location, const std::string& msg )
             : std::runtime_error( msg.c_str() ),
               location( location )
         {

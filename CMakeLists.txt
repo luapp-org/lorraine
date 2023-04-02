@@ -3,16 +3,13 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17) # C++ 17 must be installed
 
+set(SRC_DIR "src")
+set(PARSER_DIR "${SRC_DIR}/parser")
+
 project(Lorraine)
 
 # Locate LLVM package
 find_package(LLVM CONFIG REQUIRED)
-
-# Locate Bison package
-find_package(BISON)
-
-# Locate Flex package
-find_package(FLEX)
 
 # Include LLVM includes and definitions
 include_directories(${LLVM_INCLUDE_DIRS})
@@ -25,6 +22,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Create compiler executable
 add_executable(compiler
             src/main.cpp
+            src/lexer/lexer.cpp
 )
 
 # Find the libraries that correspond to the LLVM components
