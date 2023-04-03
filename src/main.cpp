@@ -10,6 +10,9 @@ using namespace lorraine;
 
 int main( int argc, char* argv[] )
 {
+    // TODO: Add command line interface which allows UTF-8 support 
+    // https://cliutils.github.io/CLI11/book/
+    
     lexer::lexer lexer( L"   [", "C.UTF-8" );
 
     lexer::token token;

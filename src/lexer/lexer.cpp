@@ -24,7 +24,6 @@ namespace lorraine::lexer
                 consume_character();
                 break;
             case L'[':
-
                 // Start long string if next char is '['
                 if ( peek_character( 1 ) == L'[' )
                 {
