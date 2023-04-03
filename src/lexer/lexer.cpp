@@ -23,6 +23,22 @@ namespace lorraine::lexer
 
                 consume_character();
                 break;
+            case L'[':
+
+                // Start long string if next char is '['
+                if ( peek_character( 1 ) == L'[' )
+                {
+                    if ( !read_long_string( start ) )
+                        throw utils::syntax_exception(
+                            { start, current_position() }, "unfinished long string near <eof>" );
+                }
+                else
+                {
+                    t.type = token_type::sym_lbracket;
+                    t.location = { start, start };
+                    consume_character();
+                }
+                break;
 
             default: break;
         }

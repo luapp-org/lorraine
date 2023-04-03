@@ -10,7 +10,7 @@ using namespace lorraine;
 
 int main( int argc, char* argv[] )
 {
-    lexer::lexer lexer( L"   '►\\n'", "C.UTF-8" );
+    lexer::lexer lexer( L"   [", "C.UTF-8" );
 
     lexer::token token;
 
