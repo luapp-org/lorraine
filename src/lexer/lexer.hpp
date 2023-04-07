@@ -10,12 +10,9 @@ namespace lorraine::lexer
        public:
         /// @brief Constructs a new lexer instance based on a source string
         /// @param source The code to tokenize
-        /// @param locale The locale to use (default C)
-        explicit lexer( const std::wstring_view& source, const char* const locale = "C" )
+        explicit lexer( const std::wstring_view& source)
             : source( source )
         {
-            std::setlocale( LC_ALL, locale );
-
             next();
         }
 
@@ -32,6 +29,9 @@ namespace lorraine::lexer
         /// @brief Gets the next token without updating the source pointer
         /// @return Next token
         token peek();
+
+        /// @brief Dumps all tokens to the console
+        void print_tokens();
 
        private:
         std::wstring_view source{};

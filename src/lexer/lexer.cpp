@@ -1,6 +1,8 @@
 #include "lexer.hpp"
 
 #include <cwctype>
+#include <iomanip>
+#include <iostream>
 
 #include "../utils/exception.hpp"
 
@@ -179,5 +181,22 @@ namespace lorraine::lexer
         } while ( peek_character() == L'=' );
 
         return delims;
+    }
+
+    void lexer::print_tokens()
+    {
+        token token;
+
+        do
+        {
+            token = current();
+
+            std::wcout << std::left << std::setw( 15 ) << token.to_string() << std::right
+                       << std::setw( 12 ) << token.location.start.line << ':'
+                       << token.location.start.column << "-" << token.location.end.line << ':'
+                       << token.location.end.column << '\n';
+
+            next();
+        } while ( token.type != token_type::eof );
     }
 }  // namespace lorraine::lexer

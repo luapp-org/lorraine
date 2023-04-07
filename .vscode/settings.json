@@ -47,6 +47,12 @@
         "cstring": "cpp",
         "cinttypes": "cpp",
         "ctime": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "chrono": "cpp",
+        "codecvt": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "ratio": "cpp",
+        "locale": "cpp"
     }
 }
