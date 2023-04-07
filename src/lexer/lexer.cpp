@@ -127,9 +127,11 @@ namespace lorraine::lexer
                 case WEOF:
                 case L'\n':
                 case L'\r':
+                {
                     throw utils::syntax_exception(
                         { start, current_position() },
-                        "unfinished string, expected closing " + quote );
+                        "unfinished string, expected closing quote" );
+                }
             }
             consume_character();
         }
@@ -183,7 +185,7 @@ namespace lorraine::lexer
         return delims;
     }
 
-    void lexer::print_tokens()
+    void lexer::print_tokens( std::wstringstream& out )
     {
         token token;
 
@@ -191,10 +193,10 @@ namespace lorraine::lexer
         {
             token = current();
 
-            std::wcout << std::left << std::setw( 15 ) << token.to_string() << std::right
-                       << std::setw( 12 ) << token.location.start.line << ':'
-                       << token.location.start.column << "-" << token.location.end.line << ':'
-                       << token.location.end.column << '\n';
+            out << std::left << std::setw( 15 ) << token.to_string() << std::right
+                << std::setw( 12 ) << token.location.start.line << ':'
+                << token.location.start.column << "-" << token.location.end.line << ':'
+                << token.location.end.column << '\n';
 
             next();
         } while ( token.type != token_type::eof );

@@ -31,7 +31,8 @@ namespace lorraine::lexer
         token peek();
 
         /// @brief Dumps all tokens to the console
-        void print_tokens();
+        /// @param out The output stream the tokens will be sent to
+        void print_tokens(std::wstringstream& out);
 
        private:
         std::wstring_view source{};
