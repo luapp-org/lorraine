@@ -72,7 +72,7 @@ namespace lorraine::lexer
         cmb_compme,   // *=
         cmb_compde,   // /=
         cmb_compmoe,  // %=
-        cmb_compoe,   // ^=
+        cmb_comppoe,   // ^=
         cmb_compce,   // ..=
         cmb_arrow,    // ->
 
@@ -162,7 +162,7 @@ namespace lorraine::lexer
                 case token_type::cmb_compme: return "*=";
                 case token_type::cmb_compde: return "/=";
                 case token_type::cmb_compmoe: return "%=";
-                case token_type::cmb_compoe: return "^=";
+                case token_type::cmb_comppoe: return "^=";
                 case token_type::cmb_compce: return "..=";
                 case token_type::cmb_arrow: return "->";
 

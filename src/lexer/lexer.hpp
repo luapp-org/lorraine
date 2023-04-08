@@ -10,8 +10,7 @@ namespace lorraine::lexer
        public:
         /// @brief Constructs a new lexer instance based on a source string
         /// @param source The code to tokenize
-        explicit lexer( const std::wstring_view& source)
-            : source( source )
+        explicit lexer( const std::wstring_view& source ) : source( source )
         {
             next();
         }
@@ -32,7 +31,7 @@ namespace lorraine::lexer
 
         /// @brief Dumps all tokens to the console
         /// @param out The output stream the tokens will be sent to
-        void print_tokens(std::wstringstream& out);
+        void print_tokens( std::wstringstream& out );
 
        private:
         std::wstring_view source{};
@@ -52,6 +51,7 @@ namespace lorraine::lexer
         void consume_space_or_comment();
 
         void read_string( const utils::position& start );
+        void read_number( const utils::position& start );
 
         // Handle long strings/comments
         const bool read_long_string( const utils::position& start );

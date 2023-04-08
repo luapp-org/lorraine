@@ -13,7 +13,7 @@ namespace lorraine::lexer
         consume_space_or_comment();
         const utils::position start = current_position();
 
-        switch ( peek_character() )
+        switch ( wchar_t c = peek_character() )
         {
             case WEOF:
                 t.type = token_type::eof;
@@ -40,8 +40,204 @@ namespace lorraine::lexer
                     consume_character();
                 }
                 break;
+            case L'=':
+                consume_character();
 
-            default: break;
+                if ( peek_character() == L'=' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_eq;
+                    t.location = { start, current_position() };
+                    break;
+                }
+
+                t.type = token_type::sym_rbracket;
+                t.location = { start, start };
+                break;
+            case L'>':
+                consume_character();
+
+                if ( peek_character() == L'=' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_ge;
+                    t.location = { start, current_position() };
+                    break;
+                }
+
+                t.type = token_type::sym_g;
+                t.location = { start, start };
+                break;
+            case L'<':
+                consume_character();
+
+                if ( peek_character() == L'=' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_le;
+                    t.location = { start, current_position() };
+                    break;
+                }
+
+                t.type = token_type::sym_l;
+                t.location = { start, start };
+                break;
+            case L'~':
+                consume_character();
+
+                if ( peek_character() == L'=' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_ne;
+                    t.location = { start, current_position() };
+                    break;
+                }
+
+                t.type = token_type::sym_wiggle;
+                t.location = { start, start };
+                break;
+            case L'.':
+                // Check if this is a decimal
+                if ( std::iswdigit( peek_character( 1 ) ) )
+                {
+                    read_number( start );
+                    break;
+                }
+
+                consume_character();
+
+                if ( peek_character() == L'.' )
+                {
+                    consume_character();
+
+                    if ( peek_character() == L'.' )
+                    {
+                        consume_character();
+
+                        t.type = token_type::cmb_vararg;
+                        t.location = { start, current_position() };
+                        break;
+                    }
+                    else if ( peek_character() == L'=' )
+                    {
+                        consume_character();
+
+                        t.type = token_type::cmb_compce;
+                        t.location = { start, current_position() };
+                        break;
+                    }
+
+                    t.type = token_type::cmb_concat;
+                    t.location = { start, current_position() };
+                    break;
+                }
+
+                t.type = token_type::sym_dot;
+                t.location = { start, start };
+                break;
+            case L'+':
+                consume_character();
+
+                if ( peek_character() == L'+' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_inc;
+                    t.location = { start, current_position() };
+                    break;
+                }
+                else if ( peek_character() == '=' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_comppe;
+                    t.location = { start, current_position() };
+                    break;
+                }
+
+                t.type = token_type::sym_plus;
+                t.location = { start, start };
+                break;
+            case L'-':
+                if ( std::iswdigit( peek_character(1) ) )
+                {
+                    read_number( start );
+                    break;
+                }
+
+                if ( peek_character() == L'-' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_dec;
+                    t.location = { start, current_position() };
+                    break;
+                }
+                else if ( peek_character() == '=' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_compme;
+                    t.location = { start, current_position() };
+                    break;
+                }
+                else if ( peek_character() == L'>' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_arrow;
+                    t.location = { start, current_position() };
+                    break;
+                }
+
+                t.type = token_type::sym_min;
+                t.location = { start, start };
+                break;
+            case L'*':
+                consume_character();
+
+                if ( peek_character() == L'=' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_compme;
+                    t.location = { start, current_position() };
+                    break;
+                }
+
+                t.type = token_type::sym_mul;
+                t.location = { start, start };
+                break;
+            case L'/':
+                consume_character();
+
+                if ( peek_character() == L'=' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_compde;
+                    t.location = { start, current_position() };
+                    break;
+                }
+
+                t.type = token_type::sym_div;
+                t.location = { start, start };
+                break;
+            case L'^':
+                consume_character();
+
+                if ( peek_character() == L'=' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_comppoe;
+                    t.location = { start, current_position() };
+                    break;
+                }
+
+                t.type = token_type::sym_pow;
+                t.location = { start, start };
+                break;
+            default:
+            {
+                if ( std::iswdigit( c ) )
+                {
+                    read_number( start );
+                    break;
+                }
+            }
         }
     }
 
@@ -139,6 +335,31 @@ namespace lorraine::lexer
         t.type = token_type::string;
         t.value = source.substr( start_offset, offset - start_offset );
         t.location = { start, current_position() };
+    }
+
+    void lexer::read_number( const utils::position& start )
+    {
+        const std::size_t start_offset = offset;
+        consume_character();
+
+        while ( std::iswdigit( peek_character() ) || peek_character() == L'.' )
+            consume_character();
+
+        if ( peek_character() == 'e' || peek_character() == 'E' )
+        {
+            consume_character();
+
+            if ( peek_character() == '+' || peek_character() == '-' )
+                consume_character();
+        }
+
+        // Added for hexadecimal support, simplifies work in the parser
+        while ( std::iswdigit( peek_character() ) || std::iswalpha( peek_character() ) )
+            consume_character();
+
+        t.location = { start, current_position() };
+        t.type = token_type::number;
+        t.value = source.substr( start_offset, offset - start_offset );
     }
 
     const bool lexer::read_long_string( const utils::position& start )
