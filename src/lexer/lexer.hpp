@@ -1,5 +1,6 @@
 #pragma once
 #include <clocale>
+#include <unordered_map>
 
 #include "token.hpp"
 
@@ -52,6 +53,7 @@ namespace lorraine::lexer
 
         void read_string( const utils::position& start );
         void read_number( const utils::position& start );
+        void read_identifier( const utils::position& start );
 
         // Handle long strings/comments
         const bool read_long_string( const utils::position& start );
@@ -59,5 +61,33 @@ namespace lorraine::lexer
 
         // Skip comments
         void skip_comment();
+
+        // Keyword dictionary
+        std::unordered_map< std::wstring_view, token_type > keyword_map = {
+            { L"and", token_type::kw_and },
+            { L"break", token_type::kw_break },
+            { L"do", token_type::kw_do },
+            { L"else", token_type::kw_else },
+            { L"elseif", token_type::kw_elseif },
+            { L"end", token_type::kw_end },
+            { L"false", token_type::kw_false },
+            { L"true", token_type::kw_true },
+            { L"for", token_type::kw_for },
+            { L"function", token_type::kw_function },
+            { L"if", token_type::kw_if },
+            { L"in", token_type::kw_in },
+            { L"local", token_type::kw_local },
+            { L"nil", token_type::kw_nil },
+            { L"not", token_type::kw_not },
+            { L"repeat", token_type::kw_repeat },
+            { L"return", token_type::kw_return },
+            { L"then", token_type::kw_then },
+            { L"until", token_type::kw_until },
+            { L"const", token_type::kw_const },
+            { L"class", token_type::kw_class },
+            { L"constructor", token_type::kw_constructor },
+            { L"implicit", token_type::kw_implicit },
+            { L"while", token_type::kw_while },
+        };
     };
 }  // namespace lorraine::lexer

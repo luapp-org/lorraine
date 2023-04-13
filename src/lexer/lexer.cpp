@@ -157,7 +157,7 @@ namespace lorraine::lexer
                 t.location = { start, start };
                 break;
             case L'-':
-                if ( std::iswdigit( peek_character(1) ) )
+                if ( std::iswdigit( peek_character( 1 ) ) )
                 {
                     read_number( start );
                     break;
@@ -237,8 +237,32 @@ namespace lorraine::lexer
                     read_number( start );
                     break;
                 }
+                else if ( std::iswalpha( c ) || c == '_' )
+                {
+                    read_identifier( start );
+                    break;
+                }
             }
         }
+    }
+
+    void lexer::read_identifier( const utils::position& start )
+    {
+        const std::size_t start_offset = offset;
+
+        // Consume all characters that qualify
+        while ( std::iswalnum( peek_character() ) || peek_character() == L'_' )
+            consume_character();
+
+        t.location = { start, current_position() };
+        t.value = source.substr( start_offset, offset - start_offset );
+
+        const auto kw_iterator = keyword_map.find( t.value );
+
+        if ( kw_iterator == keyword_map.end() )
+            t.type = token_type::identifier;
+        else
+            t.type = kw_iterator->second;
     }
 
     wchar_t lexer::peek_character( std::size_t count ) const
