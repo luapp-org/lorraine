@@ -10,17 +10,14 @@ namespace lorraine::cli
           argv( argv ),
           app( "A multipurpose optimizing compiler for the Lua++ programming language", "Lorraine" )
     {
-        std::string in_name;
+        // app.add_option( "file", options[ "inputFile" ], "Input file." );
 
-        app.add_option( "file", in_name, "Input file." );
+        app.callback( [ & ]() { callback(); } );
+    }
 
-        app.callback(
-            [ & ]()
-            {
-                // Set input content
-                input =
-                    in_name.empty() ? utils::read_console() : utils::read_file( in_name.c_str() );
-            } );
+    void cli::callback()
+    {
+        // input = utils::read_file( options[ "inputFile" ] );
     }
 
     int cli::parse()
@@ -33,5 +30,7 @@ namespace lorraine::cli
         {
             return app.exit( e );
         }
+
+        return 1;
     }
 }  // namespace lorraine::cli

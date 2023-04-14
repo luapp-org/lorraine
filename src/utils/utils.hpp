@@ -2,11 +2,15 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 namespace lorraine::utils
 {
-    std::wstring read_file( const char* filename )
+    std::wstring read_file( const std::string& filename )
     {
+        if ( filename.empty() )
+            return {};
+
         std::wifstream wif( filename );
         std::wstringstream wss;
         wss << wif.rdbuf();

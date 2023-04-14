@@ -1,5 +1,8 @@
-#include <string_view>
+#pragma once
+
 #include <string>
+#include <string_view>
+#include <unordered_map>
 
 #include "../utils/CLI11.hpp"
 
@@ -23,8 +26,9 @@ namespace lorraine::cli
         int argc;
         char** argv;
 
-        // Values filled out by the command line
         std::wstring input;
+
+        void callback();
 
     };
 }  // namespace lorraine::cli
