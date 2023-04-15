@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "../utils/CLI11.hpp"
+#include "config.hpp"
 
 namespace lorraine::cli
 {
@@ -22,13 +23,14 @@ namespace lorraine::cli
 
        private:
         CLI::App app;
+        config cfg;
 
         int argc;
         char** argv;
 
         std::wstring input;
+        std::string config_file = "./lorraineOptions.json";
 
         void callback();
-
     };
 }  // namespace lorraine::cli

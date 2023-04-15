@@ -35,6 +35,16 @@ namespace lorraine::cli
        public:
         static config load( const std::string& data, config_type type = config_type::json );
 
+        template< typename T >
+        T& get( std::string_view name )
+        {
+            return options.at( name ).get< T >();
+        }
+
        private:
+        std::unordered_map< std::string_view, option_value > options = {
+            { "inputFile", option_value{ std::string{} } },
+            { "outputFile", option_value{ std::string{} } },
+        };
     };
 }  // namespace lorraine::cli

@@ -21,10 +21,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Create compiler executable
 add_executable(compiler
-            src/main.cpp
             src/lexer/lexer.cpp
             src/cli/cli.cpp
-            src/config/config.cpp
+            src/cli/config.cpp
 )
 
 # Find the libraries that correspond to the LLVM components

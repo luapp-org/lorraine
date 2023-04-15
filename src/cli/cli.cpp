@@ -10,14 +10,16 @@ namespace lorraine::cli
           argv( argv ),
           app( "A multipurpose optimizing compiler for the Lua++ programming language", "Lorraine" )
     {
-        // app.add_option( "file", options[ "inputFile" ], "Input file." );
+        app.add_option( "file", cfg.get< std::string >( "inputFile" ), "Input file." );
+        app.add_option( "-o,--output", cfg.get< std::string >( "outputFile" ), "Output file." );
+        app.add_option( "--config", config_file, "Location of a compiler configuration file.");
 
         app.callback( [ & ]() { callback(); } );
     }
 
     void cli::callback()
     {
-        // input = utils::read_file( options[ "inputFile" ] );
+        input = utils::read_file( cfg.get< std::string >( "inputFile" ) );
     }
 
     int cli::parse()
@@ -34,3 +36,10 @@ namespace lorraine::cli
         return 1;
     }
 }  // namespace lorraine::cli
+
+int main( int argc, char* argv[] )
+{
+    lorraine::cli::cli cli{ argc, argv };
+
+    return cli.parse();
+}
