@@ -34,6 +34,7 @@ namespace lorraine::lexer
         kw_class,
         kw_constructor,
         kw_implicit,
+        kw_type,
         kw_while,
 
         // Symbols

@@ -35,7 +35,15 @@ namespace lorraine::cli
         template< typename T >
         T& get( std::string_view name )
         {
-            return options.at( name ).get< T >();
+            try
+            {
+                return options.at( name ).get< T >();
+            }
+            catch ( const std::out_of_range& e )
+            {
+                throw std::runtime_error(
+                    "Error retrieving value from option '" + std::string{ name } + "'" );
+            }
         }
 
         void try_set( std::string_view name, const std::string& value );

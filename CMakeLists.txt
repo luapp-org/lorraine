@@ -25,6 +25,10 @@ add_executable(compiler
             src/lexer/lexer.cpp
             src/cli/cli.cpp
             src/cli/config.cpp
+            src/ast/expression.cpp
+            src/ast/statement.cpp
+            src/ast/type/type.cpp
+            src/ast/type/table_descriptor.cpp
 )
 
 # Find the libraries that correspond to the LLVM components
