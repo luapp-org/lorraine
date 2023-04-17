@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -7,22 +8,34 @@
 
 namespace lorraine::utils
 {
-    /// @brief Lorraine syntax exception class. Is thrown when an unexpected error during
+    /// @brief Base error class
+    struct error
+    {
+        std::string msg;
+
+        explicit error( const std::string& msg ) : msg( msg )
+        {
+        }
+
+        virtual ~error() = default;
+    };
+
+    /// @brief Lorraine syntax error class. Is thrown when an unexpected error during
     /// syntax parsing occurs.
-    struct syntax_exception : std::runtime_error
+    struct syntax_error : error
     {
         utils::location location;
 
-        explicit syntax_exception( utils::location location, const std::string& msg )
-            : std::runtime_error( msg.c_str() ),
+        explicit syntax_error( utils::location location, const std::string& msg )
+            : error( msg ),
               location( location )
         {
         }
 
-        /// @brief Gets the lines that the syntax exception applies to
+        /// @brief Gets the lines that the syntax error applies to
         /// @param source The whole script as a string
         /// @return The "snapshot" or snippet
-        std::string get_snapshot( const std::wstring& source, std::size_t* size = nullptr ) const
+        std::string get_snapshot( const std::wstring_view& source, std::size_t* size = nullptr ) const
         {
             int start, end;
             int newlines = 1;
@@ -68,7 +81,7 @@ namespace lorraine::utils
                 location.start.line == location.end.line ? location.end.column : size;
 
             // Print the underline/spaces with color
-            for ( int i = 0; i < location.end.column; ++i )
+            for ( int i = 0; i <= location.end.column; ++i )
             {
                 if ( i < location.start.column )
                     str << ' ';

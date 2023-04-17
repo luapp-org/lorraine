@@ -1,7 +1,9 @@
 #pragma once
+
 #include <clocale>
 #include <unordered_map>
 
+#include "../compiler/compiler.hpp"
 #include "token.hpp"
 
 namespace lorraine::lexer
@@ -11,7 +13,10 @@ namespace lorraine::lexer
        public:
         /// @brief Constructs a new lexer instance based on a source string
         /// @param source The code to tokenize
-        explicit lexer( const std::wstring_view& source ) : source( source )
+        /// @param compiler Main compiler instance
+        explicit lexer( const std::wstring_view& source, compiler::compiler* compiler )
+            : source( source ),
+              compiler( compiler )
         {
             next();
         }
@@ -31,11 +36,12 @@ namespace lorraine::lexer
         token peek();
 
         /// @brief Dumps all tokens to the console
-        /// @param out The output stream the tokens will be sent to
-        void print_tokens( std::wstringstream& out );
+        /// @returns The output stream the tokens will be sent to
+        std::wstringstream print_tokens();
 
        private:
         std::wstring_view source{};
+        compiler::compiler* compiler;
 
         token t;
 

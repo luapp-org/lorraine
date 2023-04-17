@@ -4,8 +4,6 @@
 #include <iomanip>
 #include <iostream>
 
-#include "../utils/exception.hpp"
-
 namespace lorraine::lexer
 {
     void lexer::next()
@@ -30,8 +28,9 @@ namespace lorraine::lexer
                 if ( peek_character( 1 ) == L'[' )
                 {
                     if ( !read_long_string( start ) )
-                        throw utils::syntax_exception(
-                            { start, current_position() }, "unfinished long string near <eof>" );
+                        compiler->error< utils::syntax_error >(
+                            utils::location{ start, current_position() },
+                            "unfinished long string near <eof>" );
                 }
                 else
                 {
@@ -242,6 +241,14 @@ namespace lorraine::lexer
                     read_identifier( start );
                     break;
                 }
+                else
+                {
+                    compiler->error< utils::syntax_error >(
+                        utils::location{ start, current_position() }, "unrecognized character" );
+                    
+                    consume_character();
+                    return;
+                }
             }
         }
     }
@@ -327,8 +334,9 @@ namespace lorraine::lexer
             const utils::position start = current_position();
 
             if ( !read_long_string( start ) )
-                throw utils::syntax_exception(
-                    { start, current_position() }, "unfinished long comment near <eof>" );
+                compiler->error< utils::syntax_error >(
+                    utils::location{ start, current_position() },
+                    "unfinished long comment near <eof>" );
         }
 
         while ( peek_character() == L'\n' || peek_character() == L'\r' && peek_character() != WEOF )
@@ -348,9 +356,10 @@ namespace lorraine::lexer
                 case L'\n':
                 case L'\r':
                 {
-                    throw utils::syntax_exception(
-                        { start, current_position() },
+                    compiler->error< utils::syntax_error >(
+                        utils::location{ start, current_position() },
                         "unfinished string, expected closing quote" );
+                    return;
                 }
             }
             consume_character();
@@ -430,8 +439,9 @@ namespace lorraine::lexer
         return delims;
     }
 
-    void lexer::print_tokens( std::wstringstream& out )
+    std::wstringstream lexer::print_tokens()
     {
+        std::wstringstream out;
         token token;
 
         do
@@ -445,5 +455,7 @@ namespace lorraine::lexer
 
             next();
         } while ( token.type != token_type::eof );
+
+        return out;
     }
 }  // namespace lorraine::lexer

@@ -7,10 +7,7 @@
 
 namespace lorraine::cli
 {
-    enum class config_type
-    {
-        json
-    };
+    constexpr const char* default_config = "./lorraine.cfg";
 
     class option_value final
     {
@@ -33,7 +30,7 @@ namespace lorraine::cli
     class config final
     {
        public:
-        static config load( const std::string& data, config_type type = config_type::json );
+        static config load( const std::string& filename );
 
         template< typename T >
         T& get( std::string_view name )
@@ -41,10 +38,13 @@ namespace lorraine::cli
             return options.at( name ).get< T >();
         }
 
+        void try_set( std::string_view name, const std::string& value );
+
        private:
         std::unordered_map< std::string_view, option_value > options = {
-            { "inputFile", option_value{ std::string{} } },
-            { "outputFile", option_value{ std::string{} } },
+            { "locale", option_value{ std::string{ "en_US.UTF-8" } } },
+            { "elapsedTime", option_value{ true } },
+            { "detailedErrors", option_value{ true } },
         };
     };
 }  // namespace lorraine::cli
