@@ -11,9 +11,9 @@ namespace lorraine::utils
     /// @brief Base error class
     struct error
     {
-        std::string msg;
+        std::wstring msg;
 
-        explicit error( const std::string& msg ) : msg( msg )
+        explicit error( const std::wstring& msg ) : msg( msg )
         {
         }
 
@@ -26,7 +26,7 @@ namespace lorraine::utils
     {
         utils::location location;
 
-        explicit syntax_error( utils::location location, const std::string& msg )
+        explicit syntax_error( utils::location location, const std::wstring& msg )
             : error( msg ),
               location( location )
         {

@@ -33,6 +33,8 @@ namespace lorraine::ast
               type( type )
         {
         }
+
+        void visit( visitor* v ) override;
     };
 
     struct block : statement
@@ -48,5 +50,11 @@ namespace lorraine::ast
               body( std::move( body ) )
         {
         }
+
+        explicit block( const utils::location& location ) : statement( location )
+        {
+        }
+
+        void visit( visitor* v ) override;
     };
 }  // namespace lorraine::ast

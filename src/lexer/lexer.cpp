@@ -30,7 +30,7 @@ namespace lorraine::lexer
                     if ( !read_long_string( start ) )
                         compiler->error< utils::syntax_error >(
                             utils::location{ start, current_position() },
-                            "unfinished long string near <eof>" );
+                            L"unfinished long string near <eof>" );
                 }
                 else
                 {
@@ -244,7 +244,7 @@ namespace lorraine::lexer
                 else
                 {
                     compiler->error< utils::syntax_error >(
-                        utils::location{ start, current_position() }, "unrecognized character" );
+                        utils::location{ start, current_position() }, L"unrecognized character" );
                     
                     consume_character();
                     return;
@@ -336,7 +336,7 @@ namespace lorraine::lexer
             if ( !read_long_string( start ) )
                 compiler->error< utils::syntax_error >(
                     utils::location{ start, current_position() },
-                    "unfinished long comment near <eof>" );
+                    L"unfinished long comment near <eof>" );
         }
 
         while ( peek_character() == L'\n' || peek_character() == L'\r' && peek_character() != WEOF )
@@ -358,7 +358,7 @@ namespace lorraine::lexer
                 {
                     compiler->error< utils::syntax_error >(
                         utils::location{ start, current_position() },
-                        "unfinished string, expected closing quote" );
+                        L"unfinished string, expected closing quote" );
                     return;
                 }
             }

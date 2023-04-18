@@ -12,10 +12,12 @@ namespace lorraine::compiler
     {
         this->source = source;
 
-        lexer::lexer lexer( source, this );
-
         if ( stage == compiler_stage::lexer )
+        {
+            lexer::lexer lexer( source, this );
+
             return lexer.print_tokens();
+        }
 
         return {};
     }
@@ -28,7 +30,7 @@ namespace lorraine::compiler
             {
                 llvm::errs() << filename << ':' << ptr->location.start.line << ':'
                              << ptr->location.start.column + 1 << ": ";
-                llvm::WithColor::error() << ptr->msg;
+                llvm::WithColor::error() << ptr->msg.c_str();
 
                 if ( cfg.get< bool >( "detailedErrors" ) )
                 {
