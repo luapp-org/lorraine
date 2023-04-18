@@ -30,7 +30,9 @@ namespace lorraine::compiler
             {
                 llvm::errs() << filename << ':' << ptr->location.start.line << ':'
                              << ptr->location.start.column + 1 << ": ";
-                llvm::WithColor::error() << std::string{ ptr->msg.cbegin(), ptr->msg.cend() };
+                llvm::WithColor::error();
+
+                std::wcerr << ptr->msg;
 
                 if ( cfg.get< bool >( "detailedErrors" ) )
                 {
