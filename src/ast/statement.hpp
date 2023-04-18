@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <unordered_map>
 
 #include "expression.hpp"
@@ -54,6 +55,8 @@ namespace lorraine::ast
         explicit block( const utils::location& location ) : statement( location )
         {
         }
+
+        std::optional< type::type > get_type( const std::wstring& name );
 
         void visit( visitor* v ) override;
     };
