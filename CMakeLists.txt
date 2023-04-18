@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17) # C++ 17 must be installed
 
 set(SRC_DIR "src")
-set(PARSER_DIR "${SRC_DIR}/parser")
 
 project(Lorraine)
 
@@ -29,6 +28,7 @@ add_executable(compiler
             src/ast/statement.cpp
             src/ast/type/type.cpp
             src/ast/type/table_descriptor.cpp
+            src/parser/parser.cpp
 )
 
 # Find the libraries that correspond to the LLVM components
