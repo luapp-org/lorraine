@@ -27,11 +27,11 @@ namespace lorraine::parser
         // Note: doing this so that the formatter doesn't multiline
         auto& types = block->types;
 
-        types.emplace( "string", ast::type::type{ ast::type::type::primitive_type::string } );
-        types.emplace( "number", ast::type::type{ ast::type::type::primitive_type::number } );
-        types.emplace( "boolean", ast::type::type{ ast::type::type::primitive_type::boolean } );
-        types.emplace( "void", ast::type::type{ ast::type::type::primitive_type::void_ } );
-        types.emplace( "any", ast::type::type{ ast::type::type::primitive_type::any } );
+        types.emplace( L"string", ast::type::type{ ast::type::type::primitive_type::string } );
+        types.emplace( L"number", ast::type::type{ ast::type::type::primitive_type::number } );
+        types.emplace( L"boolean", ast::type::type{ ast::type::type::primitive_type::boolean } );
+        types.emplace( L"void", ast::type::type{ ast::type::type::primitive_type::void_ } );
+        types.emplace( L"any", ast::type::type{ ast::type::type::primitive_type::any } );
     }
 
     void parser::expect( const lexer::token_type type, const bool consume )
