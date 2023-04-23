@@ -214,6 +214,8 @@ namespace lorraine::parser
 
     std::unique_ptr< ast::expression > parser::parse_expression()
     {
+        const auto start = lexer.current().location.start;
+
         switch ( lexer.current().type )
         {
             case lexer::token_type::number:
@@ -224,17 +226,17 @@ namespace lorraine::parser
 
                 const wchar_t* data = lexer.current().value.data();
                 lexer.next();
-                
+
                 double value = wcstof32x( data, &end );
 
                 // Check for errors
                 if ( errno || *data == L'\0' || *end != L'\0' )
                 {
                     std::wstringstream message;
-                    message << L"Unable to convert '" << value << "' to a number value";
+                    message << L"Unable to convert '" << data << "' to a number";
 
                     compiler->throw_error< utils::syntax_error >(
-                        lexer.current().location, message.str() );
+                        utils::location{ start, lexer.current().location.end }, message.str() );
 
                     return nullptr;
                 }
