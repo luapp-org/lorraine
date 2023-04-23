@@ -5,6 +5,7 @@
 #include <llvm/Support/WithColor.h>
 
 #include "../lexer/lexer.hpp"
+#include "../parser/parser.hpp"
 
 namespace lorraine::compiler
 {
@@ -19,10 +20,14 @@ namespace lorraine::compiler
             return lexer.print_tokens();
         }
 
+        parser::parser parser( source, this );
+
+        parser.parse();
+
         return {};
     }
 
-    bool compiler::reportErrors( const std::string& filename )
+    bool compiler::report_errors( const std::string& filename )
     {
         for ( const auto& error : errors )
         {

@@ -40,7 +40,15 @@ namespace lorraine::compiler
             errors.emplace_back( new T{ args... } );
         }
 
-        bool reportErrors( const std::string& filename );
+        template< typename T, typename... Args >
+        void throw_error( const Args&... args )
+        {
+            error< T >( args... );
+
+            throw T{ args... };
+        }
+
+        bool report_errors( const std::string& filename );
 
        private:
         cli::config cfg;

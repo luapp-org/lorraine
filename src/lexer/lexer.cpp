@@ -50,7 +50,7 @@ namespace lorraine::lexer
                     break;
                 }
 
-                t.type = token_type::sym_rbracket;
+                t.type = token_type::sym_equals;
                 t.location = { start, start };
                 break;
             case L'>':
@@ -236,16 +236,27 @@ namespace lorraine::lexer
                     read_number( start );
                     break;
                 }
-                else if ( std::iswalpha( c ) || c == '_' )
+                else if ( std::iswalpha( c ) || c == L'_' )
                 {
                     read_identifier( start );
                     break;
                 }
                 else
                 {
-                    compiler->error< utils::syntax_error >(
+                    const auto it = symbol_map.find( c );
+
+                    if ( it != symbol_map.end() )
+                    {
+                        t.type = it->second;
+                        t.location = { start, start };
+
+                        consume_character();
+                        break;
+                    }
+
+                    compiler->throw_error< utils::syntax_error >(
                         utils::location{ start, current_position() }, L"unrecognized character" );
-                    
+
                     consume_character();
                     return;
                 }

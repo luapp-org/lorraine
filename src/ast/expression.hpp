@@ -9,18 +9,12 @@
 namespace lorraine::ast
 {
     struct visitor;
-    
+
     struct expression : node
     {
-        type::type type;
+        std::shared_ptr< type::type > type;
 
-        // Note: maybe change default type to 'primitive_type::unknown'? This could cause some
-        // issues in the type checker/resolver later on...
-        explicit expression(
-            const utils::location& location,
-            type::type type = type::type::primitive_type::any )
-            : node( location ),
-              type( type )
+        explicit expression( const utils::location& location ) : node( location )
         {
         }
 
@@ -34,7 +28,7 @@ namespace lorraine::ast
         double value;
 
         explicit number_literal( const utils::location& location, double value )
-            : expression( location, type::type::primitive_type::number ),
+            : expression( location ),
               value( value )
         {
         }
@@ -47,7 +41,7 @@ namespace lorraine::ast
         std::wstring value;
 
         explicit string_literal( const utils::location& location, const std::wstring& value )
-            : expression( location, type::type::primitive_type::string ),
+            : expression( location ),
               value( value )
         {
         }
@@ -60,7 +54,7 @@ namespace lorraine::ast
         bool value;
 
         explicit boolean_literal( const utils::location& location, bool value )
-            : expression( location, type::type::primitive_type::boolean ),
+            : expression( location ),
               value( value )
         {
         }
@@ -75,9 +69,38 @@ namespace lorraine::ast
     {
         std::wstring value;
 
-        explicit unresolved_identifier( const std::wstring& value )
+        explicit unresolved_identifier( const utils::location& location, const std::wstring& value )
             : expression( location ),
               value( value )
+        {
+        }
+    };
+
+    /// @brief Does not represent a node in the tree but wraps a name and type for a variable
+    /// definition. Used in local assignments and references.
+    struct variable
+    {
+        std::wstring value;
+        std::shared_ptr< type::type > type;
+
+        explicit variable( const std::wstring& value, std::shared_ptr< type::type > type )
+            : value( value ),
+              type( type )
+        {
+        }
+    };
+
+    using variable_list = std::vector< std::shared_ptr< variable > >;
+
+    struct variable_reference : expression
+    {
+        std::shared_ptr< variable > var;
+
+        explicit variable_reference(
+            const utils::location& location,
+            std::shared_ptr< variable > var )
+            : expression( location ),
+              var( var )
         {
         }
     };
@@ -99,4 +122,5 @@ namespace lorraine::ast
 
         void visit( visitor* v ) override;
     };
+
 }  // namespace lorraine::ast

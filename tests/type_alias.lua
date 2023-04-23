@@ -1,0 +1,1 @@
+type MyType = { n: number, s: string }

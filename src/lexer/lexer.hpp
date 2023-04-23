@@ -96,5 +96,13 @@ namespace lorraine::lexer
             { L"type", token_type::kw_type },
             { L"while", token_type::kw_while },
         };
+
+        std::unordered_map< wchar_t, token_type > symbol_map = {
+            { L'?', token_type::sym_question },
+            { L'{', token_type::sym_lbrace },
+            { L'}', token_type::sym_rbrace },
+            { L':', token_type::sym_colon },
+            { L',', token_type::sym_comma },
+        };
     };
 }  // namespace lorraine::lexer

@@ -42,25 +42,28 @@ namespace lorraine::ast::type
         return false;
     }
 
-    std::string type::to_string( primitive_type t )
+    std::wstring type::to_string( primitive_type t )
     {
         switch ( t )
         {
-            case primitive_type::string: return "string";
-            case primitive_type::number: return "number";
-            case primitive_type::boolean: return "boolean";
-            case primitive_type::void_: return "void";
-            case primitive_type::any: return "any";
+            case primitive_type::string: return L"string";
+            case primitive_type::number: return L"number";
+            case primitive_type::boolean: return L"boolean";
+            case primitive_type::void_: return L"void";
+            case primitive_type::any: return L"any";
 
-            default: return "unknown";
+            default: return L"unknown";
         }
     }
 
-    std::string type::to_string() const
+    std::wstring type::to_string() const
     {
         if ( const auto prim = std::get_if< primitive_type >( &value ) )
             return type::to_string( *prim );
 
-        return "unknown";
+        if ( const auto table = std::get_if< table_descriptor >( &value ) )
+            return ( *table ).to_string();
+
+        return L"unknown";
     }
 }  // namespace lorraine::ast::type

@@ -55,10 +55,18 @@ namespace lorraine::cli
         }
 
         compiler::compiler compiler( cfg );
+        std::wstring output;
 
-        std::wstring output = compiler.compile( source, get_stage() ).str();
+        try
+        {
+            output = compiler.compile( source, get_stage() ).str();
+        }
+        catch ( const utils::error& e )
+        {
+            // Ignore and fallthrough
+        }
 
-        if ( compiler.reportErrors( input_file.empty() ? "stdin" : input_file ) )
+        if ( compiler.report_errors( input_file.empty() ? "stdin" : input_file ) )
             return 0;
 
         if ( output_file.empty() )

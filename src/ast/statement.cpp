@@ -1,5 +1,7 @@
 #include "statement.hpp"
 
+#include <iostream>
+
 #include "visitor.hpp"
 
 namespace lorraine::ast
@@ -18,7 +20,7 @@ namespace lorraine::ast
         }
     }
 
-    std::optional< type::type > block::get_type( const std::wstring& name )
+    std::shared_ptr< type::type > block::get_type( const std::wstring_view& name )
     {
         const auto it = types.find( name );
 
@@ -26,8 +28,24 @@ namespace lorraine::ast
             if ( parent )
                 return parent->get_type( name );
             else
-                return std::nullopt;
+                return nullptr;
 
         return it->second;
+    }
+
+    void local_assignment::visit( visitor* v )
+    {
+        if ( v->visit( this ) )
+        {
+            // Visit values
+            for ( const auto& val : values )
+                val->visit( v );
+        }
+    }
+
+    void block::load_variable_list( variable_list variables )
+    {
+        for ( const auto& variable : variables )
+            this->variables.emplace( variable->value, variable->type );
     }
 }  // namespace lorraine::ast

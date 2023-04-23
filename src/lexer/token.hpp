@@ -58,6 +58,7 @@ namespace lorraine::lexer
         sym_lbrace,    // {
         sym_rbrace,    // }
         sym_wiggle,    // ~
+        sym_question,  // ?
 
         // Combinations
         cmb_eq,       // ==
@@ -73,7 +74,7 @@ namespace lorraine::lexer
         cmb_compme,   // *=
         cmb_compde,   // /=
         cmb_compmoe,  // %=
-        cmb_comppoe,   // ^=
+        cmb_comppoe,  // ^=
         cmb_compce,   // ..=
         cmb_arrow,    // ->
 
@@ -128,6 +129,7 @@ namespace lorraine::lexer
                 case token_type::kw_const: return L"const";
                 case token_type::kw_until: return L"until";
                 case token_type::kw_while: return L"while";
+                case token_type::kw_type: return L"type";
 
                 case token_type::sym_plus: return L"+";
                 case token_type::sym_min: return L"-";
@@ -149,6 +151,7 @@ namespace lorraine::lexer
                 case token_type::sym_lbrace: return L"{";
                 case token_type::sym_rbrace: return L"}";
                 case token_type::sym_wiggle: return L"~";
+                case token_type::sym_question: return L"?";
 
                 case token_type::cmb_eq: return L"==";
                 case token_type::cmb_ge: return L">=";
@@ -185,6 +188,10 @@ namespace lorraine::lexer
                 case token_type::string:
                 {
                     return L"\"" + std::wstring{ value.cbegin(), value.cend() } + L"\"";
+                }
+                case token_type::identifier:
+                {
+                    return L"'" + std::wstring{ value.cbegin(), value.cend() } + L"'";
                 }
             }
 

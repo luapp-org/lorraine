@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -16,13 +17,16 @@ namespace lorraine::ast::type
         // local variable where the type proceeds a ':'.
         struct table_property
         {
-            std::wstring name;
-            type* t;
+            std::wstring_view name;
+            std::shared_ptr< type > t;
 
             // Optional properties can be specified with a '?' after the property name.
             bool is_optional;
 
-            explicit table_property( const std::wstring& name, type* t, bool is_optional )
+            explicit table_property(
+                const std::wstring_view& name,
+                std::shared_ptr< type > t,
+                bool is_optional )
                 : name( name ),
                   t( t ),
                   is_optional( is_optional )
@@ -34,6 +38,10 @@ namespace lorraine::ast::type
             /// @return True if equal
             bool is( table_property property );
         };
+
+        /// @brief Returns a string representation of the table descriptor
+        /// @return New string representation
+        std::wstring to_string() const;
 
         std::vector< table_property > properties;
     };

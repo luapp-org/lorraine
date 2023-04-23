@@ -9,11 +9,13 @@
 namespace lorraine::utils
 {
     /// @brief Base error class
-    struct error
+    struct error : std::runtime_error
     {
         std::wstring msg;
 
-        explicit error( const std::wstring& msg ) : msg( msg )
+        explicit error( const std::wstring& msg )
+            : std::runtime_error( std::string{ msg.begin(), msg.end() } ),
+              msg( msg )
         {
         }
 
@@ -35,7 +37,8 @@ namespace lorraine::utils
         /// @brief Gets the lines that the syntax error applies to
         /// @param source The whole script as a string
         /// @return The "snapshot" or snippet
-        std::string get_snapshot( const std::wstring_view& source, std::size_t* size = nullptr ) const
+        std::string get_snapshot( const std::wstring_view& source, std::size_t* size = nullptr )
+            const
         {
             int start, end;
             int newlines = 1;
