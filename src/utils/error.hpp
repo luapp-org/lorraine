@@ -84,7 +84,7 @@ namespace lorraine::utils
                 location.start.line == location.end.line ? location.end.column : size;
 
             // Print the underline/spaces with color
-            for ( int i = 0; i <= location.end.column; ++i )
+            for ( int i = 0; i < location.end.column + ( size == 0 ? 1 : 0 ); ++i )
             {
                 if ( i < location.start.column )
                     str << ' ';
