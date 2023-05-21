@@ -27,31 +27,23 @@ namespace lorraine::compiler
         return {};
     }
 
-    bool compiler::report_errors( const std::string& filename )
+    void compiler::llvm_display_error( const std::string& name, const utils::syntax_error& error )
     {
-        for ( const auto& error : errors )
+        llvm::errs() << name << ':' << error.location.start.line << ':'
+                     << error.location.start.column + 1 << ": ";
+        llvm::WithColor::error();
+
+        std::wcerr << error.msg;
+
+        if ( cfg.get< bool >( "detailedErrors" ) )
         {
-            if ( auto ptr = dynamic_cast< utils::syntax_error* >( error.get() ) )
-            {
-                llvm::errs() << filename << ':' << ptr->location.start.line << ':'
-                             << ptr->location.start.column + 1 << ": ";
-                llvm::WithColor::error();
+            std::size_t s = 0;
+            llvm::errs() << ":\n" << error.get_snapshot( source, &s );
 
-                std::wcerr << ptr->msg;
-
-                if ( cfg.get< bool >( "detailedErrors" ) )
-                {
-                    std::size_t s = 0;
-                    llvm::errs() << ":\n" << ptr->get_snapshot( source, &s );
-
-                    llvm::WithColor color( llvm::errs(), llvm::raw_ostream::RED );
-                    color << ptr->get_underline( s );
-                }
-
-                llvm::errs() << '\n';
-            }
+            llvm::WithColor color( llvm::errs(), llvm::raw_ostream::RED );
+            color << error.get_underline( s );
         }
 
-        return errors.size();
+        llvm::errs() << '\n';
     }
 }  // namespace lorraine::compiler

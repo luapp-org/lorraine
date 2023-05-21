@@ -61,13 +61,10 @@ namespace lorraine::cli
         {
             output = compiler.compile( source, get_stage() ).str();
         }
-        catch ( const utils::error& e )
+        catch ( const utils::syntax_error& e )
         {
-            // Ignore and fallthrough
+            compiler.llvm_display_error(input_file.empty() ? "stdin" : input_file, e);
         }
-
-        if ( compiler.report_errors( input_file.empty() ? "stdin" : input_file ) )
-            return 0;
 
         if ( output_file.empty() )
             std::wcout << output;

@@ -50,6 +50,8 @@ namespace lorraine::compiler
 
         bool report_errors( const std::string& filename );
 
+        void llvm_display_error( const std::string& name, const utils::syntax_error& error );
+
        private:
         cli::config cfg;
         std::wstring_view source;

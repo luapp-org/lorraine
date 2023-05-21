@@ -46,8 +46,7 @@ namespace lorraine::parser
                 std::wstringstream msg;
                 msg << "unexpected " << current.to_string() << " when parsing statement";
 
-                compiler->throw_error< utils::syntax_error >( current.location, msg.str() );
-                return nullptr;
+                throw utils::syntax_error( current.location, msg.str() );
             }
         }
     }
@@ -89,7 +88,7 @@ namespace lorraine::parser
                 std::wstringstream msg;
                 msg << "unexpected " << current.to_string() << " when parsing type reference";
 
-                compiler->throw_error< utils::syntax_error >( current.location, msg.str() );
+                throw utils::syntax_error( current.location, msg.str() );
             }
         }
 
@@ -146,8 +145,7 @@ namespace lorraine::parser
         std::wstringstream msg;
         msg << "the type '" << current.value << "' does not exist in the current context";
 
-        compiler->throw_error< utils::syntax_error >( current.location, msg.str() );
-        return nullptr;
+        throw utils::syntax_error( current.location, msg.str() );
     }
 
     void parser::register_primitives( ast::block* block )
@@ -235,10 +233,9 @@ namespace lorraine::parser
                     std::wstringstream message;
                     message << L"Unable to convert '" << data << "' to a number";
 
-                    compiler->throw_error< utils::syntax_error >(
+                    throw utils::syntax_error(
                         utils::location{ start, lexer.current().location.end }, message.str() );
 
-                    return nullptr;
                 }
 
                 return std::make_unique< ast::number_literal >( lexer.current().location, value );
@@ -280,7 +277,7 @@ namespace lorraine::parser
             message << L"expected " << lexer::token::to_string( type ) << L", got "
                     << lexer.current().to_string();
 
-            compiler->throw_error< utils::syntax_error >( current_token.location, message.str() );
+            throw utils::syntax_error( current_token.location, message.str() );
         }
 
         if ( consume )
