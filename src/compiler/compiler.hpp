@@ -27,28 +27,14 @@ namespace lorraine::compiler
         }
 
         /// @brief Compiles the given source
+        /// @param name The name of the module we are currentlyu compiling
         /// @param source Code to compile
         /// @param stage Stage the compiler will stop at and generate output for
         /// @return Output stream
         std::wstringstream compile(
+            const std::string& name,
             const std::wstring_view& source,
             compiler_stage stage = compiler_stage::codegen );
-
-        template< typename T, typename... Args >
-        void error( const Args&... args )
-        {
-            errors.emplace_back( new T{ args... } );
-        }
-
-        template< typename T, typename... Args >
-        void throw_error( const Args&... args )
-        {
-            error< T >( args... );
-
-            throw T{ args... };
-        }
-
-        bool report_errors( const std::string& filename );
 
         void llvm_display_error( const std::string& name, const utils::syntax_error& error );
 

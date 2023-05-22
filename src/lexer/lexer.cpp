@@ -28,7 +28,7 @@ namespace lorraine::lexer
                 if ( peek_character( 1 ) == L'[' )
                 {
                     if ( !read_long_string( start ) )
-                        compiler->error< utils::syntax_error >(
+                        throw utils::syntax_error(
                             utils::location{ start, current_position() },
                             L"unfinished long string near <eof>" );
                 }
@@ -345,7 +345,7 @@ namespace lorraine::lexer
             const utils::position start = current_position();
 
             if ( !read_long_string( start ) )
-                compiler->error< utils::syntax_error >(
+                throw utils::syntax_error(
                     utils::location{ start, current_position() },
                     L"unfinished long comment near <eof>" );
         }
@@ -367,7 +367,7 @@ namespace lorraine::lexer
                 case L'\n':
                 case L'\r':
                 {
-                    compiler->error< utils::syntax_error >(
+                    throw utils::syntax_error(
                         utils::location{ start, current_position() },
                         L"unfinished string, expected closing quote" );
                     return;

@@ -82,4 +82,41 @@ namespace lorraine::ast
 
         void visit( visitor* v ) override;
     };
+
+    /// @brief An expression (type or function) that will be exported for accessability
+    struct export_item : statement
+    {
+        std::unique_ptr< statement > item;
+
+        explicit export_item( const utils::location& location, std::unique_ptr< statement > item )
+            : statement( location ),
+              item( std::move( item ) )
+        {
+        }
+
+        void visit( visitor* v ) override;
+    };
+
+    using export_list = std::vector< std::unique_ptr< export_item > >;
+
+    /// @brief An object that can be referenced from different files
+    struct module : statement
+    {
+        std::string name;
+        std::unique_ptr< block > body;
+
+        explicit module(
+            const utils::location& location,
+            std::string name,
+            std::unique_ptr< block > body )
+            : statement( location ),
+              name( std::move( name ) ),
+              body( std::move( body ) )
+        {
+        }
+
+        void visit( visitor* v ) override;
+
+        static std::string get_module_name( std::string filename );
+    };
 }  // namespace lorraine::ast

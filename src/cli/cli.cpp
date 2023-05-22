@@ -56,14 +56,15 @@ namespace lorraine::cli
 
         compiler::compiler compiler( cfg );
         std::wstring output;
+        std::string name = input_file.empty() ? "stdin" : input_file;
 
         try
         {
-            output = compiler.compile( source, get_stage() ).str();
+            output = compiler.compile( name, source, get_stage() ).str();
         }
         catch ( const utils::syntax_error& e )
         {
-            compiler.llvm_display_error(input_file.empty() ? "stdin" : input_file, e);
+            compiler.llvm_display_error( name, e);
         }
 
         if ( output_file.empty() )

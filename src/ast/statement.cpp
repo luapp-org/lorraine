@@ -43,9 +43,29 @@ namespace lorraine::ast
         }
     }
 
+    void export_item::visit( visitor* v )
+    {
+        if ( v->visit( this ) )
+            item->visit( v );
+    }
+
+    void module::visit( visitor* v )
+    {
+        if ( v->visit( this ) )
+            body->visit( v );
+    }
+
     void block::load_variable_list( variable_list variables )
     {
         for ( const auto& variable : variables )
             this->variables.emplace( variable->value, variable->type );
+    }
+
+    std::string module::get_module_name( std::string filename )
+    {
+        if (filename != "stdin")
+            return filename.erase(filename.size() - 3);
+        
+        return filename;
     }
 }  // namespace lorraine::ast

@@ -9,7 +9,10 @@
 
 namespace lorraine::compiler
 {
-    std::wstringstream compiler::compile( const std::wstring_view& source, compiler_stage stage )
+    std::wstringstream compiler::compile(
+        const std::string& name,
+        const std::wstring_view& source,
+        compiler_stage stage )
     {
         this->source = source;
 
