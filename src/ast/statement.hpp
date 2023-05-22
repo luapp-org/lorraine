@@ -59,6 +59,10 @@ namespace lorraine::ast
         }
 
         std::shared_ptr< type::type > get_type( const std::wstring_view& name );
+        std::shared_ptr< type::type > get_variable_type( const std::wstring_view& name );
+
+        std::unique_ptr< ast::expression > get_name( const utils::location& location, const std::wstring_view& name );
+
         void load_variable_list( variable_list variables );
 
         void visit( visitor* v ) override;
@@ -105,11 +109,8 @@ namespace lorraine::ast
         std::string name;
         std::unique_ptr< block > body;
 
-        explicit module(
-            const utils::location& location,
-            std::string name,
-            std::unique_ptr< block > body )
-            : statement( location ),
+        explicit module( std::string name, std::unique_ptr< block > body )
+            : statement( body->location ),
               name( std::move( name ) ),
               body( std::move( body ) )
         {
@@ -118,5 +119,23 @@ namespace lorraine::ast
         void visit( visitor* v ) override;
 
         static std::string get_module_name( std::string filename );
+    };
+
+    struct import : statement
+    {
+        expression_list name_list;
+        std::unique_ptr< ast::module > module;
+
+        explicit import(
+            const utils::location& location,
+            expression_list name_list,
+            std::unique_ptr< ast::module > module )
+            : statement( location ),
+              name_list( std::move( name_list ) ),
+              module( std::move( module ) )
+        {
+        }
+
+        void visit( visitor* v ) override;
     };
 }  // namespace lorraine::ast

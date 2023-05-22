@@ -11,19 +11,25 @@ namespace lorraine::parser
     {
        public:
         /// @brief Initializes a new parser class instance
-        explicit parser( const std::wstring_view& source, compiler::compiler* compiler )
+        explicit parser(
+            const std::string& name,
+            const std::wstring_view& source,
+            compiler::compiler* compiler )
             : lexer( source, compiler ),
-              compiler( compiler )
+              compiler( compiler ),
+              name( name )
         {
         }
 
         /// @brief Parses the source code into an abstract syntax tree
         /// @return A new block
-        std::unique_ptr< ast::block > parse();
+        std::unique_ptr< ast::module > parse();
 
        private:
         lexer::lexer lexer;
         compiler::compiler* compiler;
+
+        std::string name;
 
         /// @brief Last block created and entered. Type and variable definitions will get added.
         ast::block* last_block = nullptr;
@@ -50,7 +56,7 @@ namespace lorraine::parser
         /// @return A new AST statement
         std::unique_ptr< ast::statement > parse_statement();
 
-        /// @brief Parses an expression from the source code. 
+        /// @brief Parses an expression from the source code.
         /// @return Expression
         std::unique_ptr< ast::expression > parse_expression();
 
@@ -86,5 +92,13 @@ namespace lorraine::parser
         /// @brief Parses a single variable from source code. Assigns type 'any' if not annotated.
         /// @return Variable pointer
         std::shared_ptr< ast::variable > parse_variable();
+
+        /// @brief Parses an import statement and loads the referenced module.
+        /// @return Import statement
+        std::unique_ptr< ast::import > parse_import();
+
+        /// @brief Parses a list of identifiers. These can be either variables or types. 
+        /// @return List of identifiers
+        ast::expression_list parse_identifier_list();
     };
 }  // namespace lorraine::parser

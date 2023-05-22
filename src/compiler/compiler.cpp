@@ -23,7 +23,7 @@ namespace lorraine::compiler
             return lexer.print_tokens();
         }
 
-        parser::parser parser( source, this );
+        parser::parser parser( name, source, this );
 
         parser.parse();
 

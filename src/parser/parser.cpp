@@ -2,12 +2,12 @@
 
 namespace lorraine::parser
 {
-    std::unique_ptr< ast::block > parser::parse()
+    std::unique_ptr< ast::module > parser::parse()
     {
         auto root = parse_block();
 
         expect( lexer::token_type::eof );
-        return root;
+        return std::make_unique< ast::module >( name, std::move( root ) );
     }
 
     std::unique_ptr< ast::block > parser::parse_block()
@@ -40,6 +40,7 @@ namespace lorraine::parser
         {
             case lexer::token_type::kw_type: return parse_type_alias();
             case lexer::token_type::kw_local: return parse_local_assignment();
+            case lexer::token_type::kw_import: return parse_import();
 
             default:
             {
@@ -49,6 +50,22 @@ namespace lorraine::parser
                 throw utils::syntax_error( current.location, msg.str() );
             }
         }
+    }
+
+    std::unique_ptr< ast::import > parser::parse_import()
+    {
+        const auto& start = lexer.current().location.start;
+
+        expect( lexer::token_type::kw_import, true );
+
+        // TODO: Add syntax that imports all exported items (e.g. '*')
+        expect( lexer::token_type::sym_lbrace, true );
+
+    }
+
+    ast::expression_list parser::parse_identifier_list()
+    {
+
     }
 
     std::unique_ptr< ast::type_alias_definition > parser::parse_type_alias()
@@ -235,7 +252,6 @@ namespace lorraine::parser
 
                     throw utils::syntax_error(
                         utils::location{ start, lexer.current().location.end }, message.str() );
-
                 }
 
                 return std::make_unique< ast::number_literal >( lexer.current().location, value );
