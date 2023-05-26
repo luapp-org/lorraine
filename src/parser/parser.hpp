@@ -15,7 +15,8 @@ namespace lorraine::parser
             const std::string& name,
             const std::wstring_view& source,
             compiler::compiler* compiler )
-            : lexer( source, compiler ),
+            : source( source ),
+              lexer( source, compiler ),
               compiler( compiler ),
               name( name )
         {
@@ -30,6 +31,7 @@ namespace lorraine::parser
         compiler::compiler* compiler;
 
         std::string name;
+        std::wstring_view source;
 
         /// @brief Last block created and entered. Type and variable definitions will get added.
         ast::block* last_block = nullptr;
@@ -45,9 +47,12 @@ namespace lorraine::parser
         void expect( const lexer::token_type type, const bool consume = false );
 
         /// @brief Opens a new module and parses it into an AST
+        /// @param loc The location of the import statement invoking this function
         /// @param name The module name
         /// @return The new module
-        std::unique_ptr< ast::module > get_module( const std::wstring_view& name );
+        std::unique_ptr< ast::module > get_module(
+            const utils::location& loc,
+            const std::wstring_view& name );
 
         /// @brief Parses a block (list of statements)
         /// @return New block

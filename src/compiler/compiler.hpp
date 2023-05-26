@@ -36,7 +36,10 @@ namespace lorraine::compiler
             const std::wstring_view& source,
             compiler_stage stage = compiler_stage::codegen );
 
-        void llvm_display_error( const std::string& name, const utils::syntax_error& error );
+        void llvm_display_error(
+            const std::string& name,
+            const std::wstring_view& source,
+            const utils::syntax_error& error );
 
        private:
         cli::config cfg;

@@ -30,7 +30,7 @@ namespace lorraine::compiler
         return {};
     }
 
-    void compiler::llvm_display_error( const std::string& name, const utils::syntax_error& error )
+    void compiler::llvm_display_error( const std::string& name, const std::wstring_view& source, const utils::syntax_error& error )
     {
         llvm::errs() << name << ':' << error.location.start.line << ':'
                      << error.location.start.column + 1 << ": ";

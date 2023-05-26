@@ -61,7 +61,9 @@ namespace lorraine::ast
         std::shared_ptr< type::type > get_type( const std::wstring_view& name );
         std::shared_ptr< type::type > get_variable_type( const std::wstring_view& name );
 
-        std::unique_ptr< ast::expression > get_name( const utils::location& location, const std::wstring_view& name );
+        std::unique_ptr< ast::expression > get_name(
+            const utils::location& location,
+            const std::wstring_view& name );
 
         void load_variable_list( variable_list variables );
 
@@ -106,14 +108,15 @@ namespace lorraine::ast
     /// @brief An object that can be referenced from different files
     struct module : statement
     {
-        std::string name;
+        std::string path, name;
         std::unique_ptr< block > body;
 
-        explicit module( std::string name, std::unique_ptr< block > body )
+        explicit module( const std::string& path, std::unique_ptr< block > body )
             : statement( body->location ),
-              name( std::move( name ) ),
+              path( path ),
               body( std::move( body ) )
         {
+            name = get_module_name( path );
         }
 
         void visit( visitor* v ) override;

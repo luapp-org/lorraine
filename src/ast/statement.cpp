@@ -64,7 +64,12 @@ namespace lorraine::ast
     std::string module::get_module_name( std::string filename )
     {
         if ( filename != "stdin" )
-            return filename.erase( filename.size() - 3 );
+        {
+            const auto last = filename.find_last_of( "/\\" ) + 1;
+            const auto len = filename.find_last_of( "." ) - last;
+            
+            return filename.substr(last, len);
+        }
 
         return filename;
     }

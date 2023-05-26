@@ -6,10 +6,20 @@ namespace lorraine::parser
 {
     std::unique_ptr< ast::module > parser::parse()
     {
-        auto root = parse_block();
+        std::unique_ptr< ast::block > root = nullptr;
 
-        expect( lexer::token_type::eof );
-        return std::make_unique< ast::module >( name, std::move( root ) );
+        try
+        {
+            root = parse_block();
+
+            expect( lexer::token_type::eof );
+            return std::make_unique< ast::module >( name, std::move( root ) );
+        }
+        catch ( const utils::syntax_error& e )
+        {
+            compiler->llvm_display_error( name, source, e );
+            return nullptr;
+        }
     }
 
     std::unique_ptr< ast::block > parser::parse_block()
@@ -36,7 +46,7 @@ namespace lorraine::parser
     std::unique_ptr< ast::statement > parser::parse_statement()
     {
         const auto& current = lexer.current();
-        
+
         // Switch current token type
         switch ( current.type )
         {
@@ -76,7 +86,9 @@ namespace lorraine::parser
 
             expect( lexer::token_type::string );
 
-            std::unique_ptr< ast::module > module = get_module( lexer.current().value );
+            const auto& current = lexer.current();
+
+            std::unique_ptr< ast::module > module = get_module( current.location, current.value );
             lexer.next();
         }
 
@@ -99,14 +111,26 @@ namespace lorraine::parser
         return identifiers;
     }
 
-    std::unique_ptr< ast::module > parser::get_module( const std::wstring_view& name )
+    std::unique_ptr< ast::module > parser::get_module(
+        const utils::location& loc,
+        const std::wstring_view& name )
     {
         auto name_str = std::string{ name.begin(), name.end() };
+        auto dir = utils::io::get_dir( this->name );
+        auto full_name = dir + name_str + ".lua";
 
-        // TODO: Check if module actually exists
-        const auto source = utils::io::read_file( name_str + ".lua" );
-        std::wcout << source << std::endl;
-        parser parser{ name_str, source, compiler };
+        // Check if module actually exists
+        auto source = utils::io::read_file( full_name );
+
+        if ( !source.has_value() )
+        {
+            std::wstringstream msg;
+            msg << "unable to open module '" << name_str.c_str() << "'";
+
+            throw utils::syntax_error( loc, msg.str() );
+        }
+
+        parser parser{ full_name, *source, compiler };
 
         return parser.parse();
     }

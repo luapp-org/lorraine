@@ -38,7 +38,9 @@ namespace lorraine::cli
         if ( !config_file.empty() )
             cfg = config::load( config_file );
 
-        source = input_file.empty() ? utils::io::read_console() : utils::io::read_file( input_file );
+        // This is really bad btw... Fix!!!
+        source =
+            input_file.empty() ? utils::io::read_console() : *utils::io::read_file( input_file );
 
         std::locale::global( std::locale( cfg.get< std::string >( "locale" ) ) );
     }
@@ -55,17 +57,10 @@ namespace lorraine::cli
         }
 
         compiler::compiler compiler( cfg );
-        std::wstring output;
+
         std::string name = input_file.empty() ? "stdin" : input_file;
 
-        try
-        {
-            output = compiler.compile( name, source, get_stage() ).str();
-        }
-        catch ( const utils::syntax_error& e )
-        {
-            compiler.llvm_display_error( name, e);
-        }
+        std::wstring output = compiler.compile( name, source, get_stage() ).str();
 
         if ( output_file.empty() )
             std::wcout << output;
