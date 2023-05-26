@@ -1,3 +1,5 @@
+#pragma once
+
 #include <codecvt>
 #include <fstream>
 #include <iostream>
@@ -6,23 +8,11 @@
 
 namespace lorraine::utils
 {
-    std::wstring read_file( const std::string& filename )
+    struct io
     {
-        if ( filename.empty() )
-            return {};
+        static std::wstring read_file( const std::string& filename );
 
-        std::wifstream wif( filename );
-        std::wstringstream wss;
-        wss << wif.rdbuf();
-        return wss.str();
-    }
+        static std::wstring read_console();
+    };
 
-    std::wstring read_console()
-    {
-        std::wstring out;
-        std::cout << "> ";
-        std::getline( std::wcin, out );
-
-        return out;
-    }
 }  // namespace lorraine::utils

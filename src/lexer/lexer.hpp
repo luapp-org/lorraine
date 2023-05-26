@@ -94,6 +94,8 @@ namespace lorraine::lexer
             { L"constructor", token_type::kw_constructor },
             { L"implicit", token_type::kw_implicit },
             { L"type", token_type::kw_type },
+            { L"import", token_type::kw_import },
+            { L"from", token_type::kw_from },
             { L"while", token_type::kw_while },
         };
 

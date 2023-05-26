@@ -76,6 +76,15 @@ namespace lorraine::ast
         }
     };
 
+    struct type_wrapper : expression
+    {
+        explicit type_wrapper( const utils::location& location, std::shared_ptr< type::type > type )
+            : expression( location )
+        {
+            this->type = type;
+        }
+    };
+
     /// @brief Does not represent a node in the tree but wraps a name and type for a variable
     /// definition. Used in local assignments and references.
     struct variable

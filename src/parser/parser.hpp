@@ -44,6 +44,11 @@ namespace lorraine::parser
         /// @param consume Tells the function to consume the following token
         void expect( const lexer::token_type type, const bool consume = false );
 
+        /// @brief Opens a new module and parses it into an AST
+        /// @param name The module name
+        /// @return The new module
+        std::unique_ptr< ast::module > get_module( const std::wstring_view& name );
+
         /// @brief Parses a block (list of statements)
         /// @return New block
         std::unique_ptr< ast::block > parse_block();
@@ -97,8 +102,8 @@ namespace lorraine::parser
         /// @return Import statement
         std::unique_ptr< ast::import > parse_import();
 
-        /// @brief Parses a list of identifiers. These can be either variables or types. 
+        /// @brief Parses a list of identifiers. These can be either variables or types.
         /// @return List of identifiers
-        ast::expression_list parse_identifier_list();
+        std::vector< lexer::token > parse_identifier_list();
     };
 }  // namespace lorraine::parser

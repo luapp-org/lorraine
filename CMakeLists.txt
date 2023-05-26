@@ -20,6 +20,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Create compiler executable
 add_executable(compiler
+            src/utils/utils.cpp
             src/compiler/compiler.cpp
             src/lexer/lexer.cpp
             src/cli/cli.cpp

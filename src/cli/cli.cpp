@@ -38,7 +38,7 @@ namespace lorraine::cli
         if ( !config_file.empty() )
             cfg = config::load( config_file );
 
-        source = input_file.empty() ? utils::read_console() : utils::read_file( input_file );
+        source = input_file.empty() ? utils::io::read_console() : utils::io::read_file( input_file );
 
         std::locale::global( std::locale( cfg.get< std::string >( "locale" ) ) );
     }

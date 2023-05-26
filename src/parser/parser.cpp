@@ -1,5 +1,7 @@
 #include "parser.hpp"
 
+#include "../utils/utils.hpp"
+
 namespace lorraine::parser
 {
     std::unique_ptr< ast::module > parser::parse()
@@ -34,7 +36,7 @@ namespace lorraine::parser
     std::unique_ptr< ast::statement > parser::parse_statement()
     {
         const auto& current = lexer.current();
-
+        
         // Switch current token type
         switch ( current.type )
         {
@@ -59,13 +61,54 @@ namespace lorraine::parser
         expect( lexer::token_type::kw_import, true );
 
         // TODO: Add syntax that imports all exported items (e.g. '*')
-        expect( lexer::token_type::sym_lbrace, true );
+        bool import_all;
 
+        if ( import_all = ( lexer.current().type == lexer::token_type::sym_mul ) )
+            lexer.next();
+        else
+        {
+            expect( lexer::token_type::sym_lbrace, true );
+
+            auto identifiers = parse_identifier_list();
+
+            expect( lexer::token_type::sym_rbrace, true );
+            expect( lexer::token_type::kw_from, true );
+
+            expect( lexer::token_type::string );
+
+            std::unique_ptr< ast::module > module = get_module( lexer.current().value );
+            lexer.next();
+        }
+
+        return nullptr;
     }
 
-    ast::expression_list parser::parse_identifier_list()
+    std::vector< lexer::token > parser::parse_identifier_list()
     {
+        std::vector< lexer::token > identifiers;
 
+        do
+        {
+            expect( lexer::token_type::identifier );
+            identifiers.push_back( lexer.current() );
+
+            lexer.next();
+
+        } while ( lexer.current().type == lexer::token_type::sym_comma );
+
+        return identifiers;
+    }
+
+    std::unique_ptr< ast::module > parser::get_module( const std::wstring_view& name )
+    {
+        auto name_str = std::string{ name.begin(), name.end() };
+
+        // TODO: Check if module actually exists
+        const auto source = utils::io::read_file( name_str + ".lua" );
+        std::wcout << source << std::endl;
+        parser parser{ name_str, source, compiler };
+
+        return parser.parse();
     }
 
     std::unique_ptr< ast::type_alias_definition > parser::parse_type_alias()
@@ -290,8 +333,8 @@ namespace lorraine::parser
         if ( current_token.type != type )
         {
             std::wstringstream message;
-            message << L"expected " << lexer::token::to_string( type ) << L", got "
-                    << lexer.current().to_string();
+            message << L"expected '" << lexer::token::to_string( type ) << L"', got '"
+                    << lexer.current().to_string() << "'";
 
             throw utils::syntax_error( current_token.location, message.str() );
         }

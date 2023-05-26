@@ -93,19 +93,21 @@ namespace lorraine::ast
         return it->second;
     }
 
-    std::unique_ptr< expression > block::get_name(
-        const utils::location& location,
-        const std::wstring_view& name )
-    {
-        if ( auto type = get_variable_type( name ) )
-        {
-            std::shared_ptr< variable > var =
-                std::make_shared< variable >( std::wstring{ name.begin(), name.end() }, type );
+    // std::unique_ptr< expression > block::get_name(
+    //     const utils::location& location,
+    //     const std::wstring_view& name )
+    // {
+    //     if ( auto type = get_variable_type( name ) )
+    //     {
+    //         std::shared_ptr< variable > var =
+    //             std::make_shared< variable >( std::wstring{ name.begin(), name.end() }, type );
 
-            return std::make_unique< variable_reference >( location, var );
-        }
+    //         return std::make_unique< variable_reference >( location, var );
+    //     }
+    //     else if ( auto name_type = get_type( name ) )
+    //         return std::make_unique< type_wrapper >( location, name_type );
 
-        
-    }
+    //     return nullptr;
+    // }
 
 }  // namespace lorraine::ast
