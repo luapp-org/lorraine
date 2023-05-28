@@ -28,8 +28,8 @@ namespace lorraine::ast
         visitor_definition( expression, boolean_literal );
         visitor_definition( expression, unresolved_identifier );
         visitor_definition( expression, call );
+        visitor_definition( expression, type_alias_definition );
 
-        visitor_definition( statement, type_alias_definition );
         visitor_definition( statement, block );
     };
 }  // namespace lorraine::ast

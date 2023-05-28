@@ -74,15 +74,25 @@ namespace lorraine::ast
               value( value )
         {
         }
+
+        void visit( visitor* v ) override;
     };
 
     struct type_wrapper : expression
     {
-        explicit type_wrapper( const utils::location& location, std::shared_ptr< type::type > type )
-            : expression( location )
+        std::wstring name;
+
+        explicit type_wrapper(
+            const utils::location& location,
+            const std::wstring& name,
+            std::shared_ptr< type::type > type )
+            : expression( location ),
+              name( name )
         {
             this->type = type;
         }
+
+        void visit( visitor* v ) override;
     };
 
     /// @brief Does not represent a node in the tree but wraps a name and type for a variable
@@ -112,6 +122,8 @@ namespace lorraine::ast
               var( var )
         {
         }
+
+        void visit( visitor* v ) override;
     };
 
     struct call : expression
@@ -126,6 +138,25 @@ namespace lorraine::ast
             : expression( location ),
               function( std::move( function ) ),
               arguments( std::move( arguments ) )
+        {
+        }
+
+        void visit( visitor* v ) override;
+    };
+
+    /// @brief Represents a type alias definition in the AST. `type' Name = type
+    struct type_alias_definition : expression
+    {
+        std::wstring_view name;
+        std::shared_ptr< ast::type::type > type;
+
+        explicit type_alias_definition(
+            const utils::location& location,
+            const std::wstring_view& name,
+            std::shared_ptr< ast::type::type > type )
+            : expression( location ),
+              name( name ),
+              type( type )
         {
         }
 

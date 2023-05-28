@@ -36,6 +36,7 @@ namespace lorraine::lexer
         kw_implicit,
         kw_type,
         kw_import,
+        kw_export,
         kw_from,
         kw_while,
 
@@ -132,6 +133,7 @@ namespace lorraine::lexer
                 case token_type::kw_until: return L"until";
                 case token_type::kw_while: return L"while";
                 case token_type::kw_import: return L"import";
+                case token_type::kw_export: return L"export";
                 case token_type::kw_from: return L"from";
                 case token_type::kw_type: return L"type";
 

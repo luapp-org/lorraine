@@ -33,6 +33,16 @@ namespace lorraine::ast
         return it->second;
     }
 
+    std::shared_ptr< type::type > block::get_export_type( const std::wstring_view& name )
+    {
+        const auto it = export_types.find( name );
+
+        if ( it == export_types.end() )
+            return nullptr;
+
+        return it->second;
+    }
+
     void local_assignment::visit( visitor* v )
     {
         if ( v->visit( this ) )
@@ -67,8 +77,8 @@ namespace lorraine::ast
         {
             const auto last = filename.find_last_of( "/\\" ) + 1;
             const auto len = filename.find_last_of( "." ) - last;
-            
-            return filename.substr(last, len);
+
+            return filename.substr( last, len );
         }
 
         return filename;
@@ -98,21 +108,20 @@ namespace lorraine::ast
         return it->second;
     }
 
-    // std::unique_ptr< expression > block::get_name(
-    //     const utils::location& location,
-    //     const std::wstring_view& name )
-    // {
-    //     if ( auto type = get_variable_type( name ) )
-    //     {
-    //         std::shared_ptr< variable > var =
-    //             std::make_shared< variable >( std::wstring{ name.begin(), name.end() }, type );
+    std::shared_ptr< type::type > block::get_export_variable_type( const std::wstring_view& name )
+    {
+        const auto it = export_variables.find( name );
 
-    //         return std::make_unique< variable_reference >( location, var );
-    //     }
-    //     else if ( auto name_type = get_type( name ) )
-    //         return std::make_unique< type_wrapper >( location, name_type );
+        if ( it == export_variables.end() )
+            return nullptr;
 
-    //     return nullptr;
-    // }
+        return it->second;
+    }
+
+    void expression_statement::visit( visitor* v )
+    {
+        if ( v->visit( this ) )
+            expr->visit( v );
+    }
 
 }  // namespace lorraine::ast

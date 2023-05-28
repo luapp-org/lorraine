@@ -1,3 +1,3 @@
-import { MyType } from 'local_assignment'
+import { MyType } from 'type_alias'
 
 local a: MyType = 1

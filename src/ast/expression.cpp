@@ -14,6 +14,21 @@ namespace lorraine::ast
         v->visit( this );
     }
 
+    void unresolved_identifier::visit( visitor* v )
+    {
+        v->visit( this );
+    }
+
+    void variable_reference::visit( visitor* v )
+    {
+        v->visit( this );
+    }
+
+    void type_wrapper::visit( visitor* v )
+    {
+        v->visit( this );
+    }
+
     void call::visit( visitor* v )
     {
         if ( v->visit( this ) )

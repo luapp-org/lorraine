@@ -110,5 +110,9 @@ namespace lorraine::parser
         /// @brief Parses a list of identifiers. These can be either variables or types.
         /// @return List of identifiers
         std::vector< lexer::token > parse_identifier_list();
+
+        /// @brief Parses an export statement. 
+        /// @return Export statement
+        std::unique_ptr< ast::export_item > parse_export();
     };
 }  // namespace lorraine::parser

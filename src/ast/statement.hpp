@@ -18,26 +18,20 @@ namespace lorraine::ast
         virtual ~statement() = default;
     };
 
-    using statement_list = std::vector< std::unique_ptr< statement > >;
-
-    /// @brief Represents a type alias definition in the AST. `type' Name = type
-    struct type_alias_definition : statement
+    struct expression_statement : statement
     {
-        std::wstring_view name;
-        std::shared_ptr< ast::type::type > type;
+        std::unique_ptr< expression > expr;
 
-        explicit type_alias_definition(
-            const utils::location& location,
-            const std::wstring_view& name,
-            std::shared_ptr< ast::type::type > type )
-            : statement( location ),
-              name( name ),
-              type( type )
+        explicit expression_statement( std::unique_ptr< ast::expression > expr )
+            : statement( expr->location ),
+              expr( std::move( expr ) )
         {
         }
 
         void visit( visitor* v ) override;
     };
+
+    using statement_list = std::vector< std::unique_ptr< statement > >;
 
     struct block : statement
     {
@@ -47,6 +41,10 @@ namespace lorraine::ast
         // Data structures for the block's content
         std::unordered_map< std::wstring_view, std::shared_ptr< type::type > > variables;
         std::unordered_map< std::wstring_view, std::shared_ptr< type::type > > types;
+
+        // Exportable data types
+        std::unordered_map< std::wstring_view, std::shared_ptr< type::type > > export_variables;
+        std::unordered_map< std::wstring_view, std::shared_ptr< type::type > > export_types;
 
         explicit block( const utils::location& location, statement_list body )
             : statement( location ),
@@ -61,9 +59,8 @@ namespace lorraine::ast
         std::shared_ptr< type::type > get_type( const std::wstring_view& name );
         std::shared_ptr< type::type > get_variable_type( const std::wstring_view& name );
 
-        std::unique_ptr< ast::expression > get_name(
-            const utils::location& location,
-            const std::wstring_view& name );
+        std::shared_ptr< type::type > get_export_type( const std::wstring_view& name );
+        std::shared_ptr< type::type > get_export_variable_type( const std::wstring_view& name );
 
         void load_variable_list( variable_list variables );
 
@@ -89,12 +86,12 @@ namespace lorraine::ast
         void visit( visitor* v ) override;
     };
 
-    /// @brief An expression (type or function) that will be exported for accessability
+    /// @brief An expression (type or variable) that will be exported for accessability
     struct export_item : statement
     {
-        std::unique_ptr< statement > item;
+        std::unique_ptr< expression > item;
 
-        explicit export_item( const utils::location& location, std::unique_ptr< statement > item )
+        explicit export_item( const utils::location& location, std::unique_ptr< expression > item )
             : statement( location ),
               item( std::move( item ) )
         {

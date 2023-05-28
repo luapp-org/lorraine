@@ -50,9 +50,15 @@ namespace lorraine::parser
         // Switch current token type
         switch ( current.type )
         {
-            case lexer::token_type::kw_type: return parse_type_alias();
+            case lexer::token_type::kw_type:
+            {
+                std::unique_ptr< ast::type_alias_definition > alias = parse_type_alias();
+
+                return std::make_unique< ast::expression_statement >( std::move( alias ) );
+            }
             case lexer::token_type::kw_local: return parse_local_assignment();
             case lexer::token_type::kw_import: return parse_import();
+            case lexer::token_type::kw_export: return parse_export();
 
             default:
             {
@@ -62,6 +68,8 @@ namespace lorraine::parser
                 throw utils::syntax_error( current.location, msg.str() );
             }
         }
+
+        return nullptr;
     }
 
     std::unique_ptr< ast::import > parser::parse_import()
@@ -90,9 +98,76 @@ namespace lorraine::parser
 
             std::unique_ptr< ast::module > module = get_module( current.location, current.value );
             lexer.next();
+
+            // Add all identifiers to an expression list
+            ast::expression_list imports;
+            for ( const auto& identifier : identifiers )
+            {
+                const auto name = identifier.value;
+
+                // If we are importing a variable
+                if ( auto type = module->body->get_export_variable_type( name ) )
+                {
+                    std::shared_ptr< ast::variable > var = std::make_shared< ast::variable >(
+                        std::wstring{ name.begin(), name.end() }, type );
+
+                    imports.push_back(
+                        std::make_unique< ast::variable_reference >( identifier.location, var ) );
+
+                    last_block->variables.emplace( name, type );
+                }
+                // If we are importing a type definition
+                else if ( auto type = module->body->get_export_type( name ) )
+                {
+                    imports.push_back( std::make_unique< ast::type_wrapper >(
+                        identifier.location, std::wstring{ name.begin(), name.end() }, type ) );
+
+                    last_block->types.emplace( name, type );
+                }
+                else
+                {
+                    std::wstringstream msg;
+                    msg << "unable to find export of '" << name << "' in " << module->path.c_str();
+
+                    throw utils::syntax_error( identifier.location, msg.str() );
+                }
+            }
         }
 
         return nullptr;
+    }
+
+    std::unique_ptr< ast::export_item > parser::parse_export()
+    {
+        if ( last_block->parent != nullptr )
+            throw utils::syntax_error(
+                lexer.current().location,
+                L"exports are only allowed in the lowest scope level of the module" );
+
+        const auto& start = lexer.current().location.start;
+
+        expect( lexer::token_type::kw_export, true );
+
+        const auto current = lexer.current();
+
+        switch ( current.type )
+        {
+            case lexer::token_type::kw_type:
+            {
+                std::unique_ptr< ast::type_alias_definition > type_alias = parse_type_alias();
+
+                last_block->export_types.emplace( type_alias->name, type_alias->type );
+
+                return std::make_unique< ast::export_item >(
+                    utils::location{ start, lexer.current().location.end },
+                    std::move( type_alias ) );
+            }
+        }
+
+        std::wstringstream msg;
+        msg << "unexpected " << current.to_string() << " when parsing export statement";
+
+        throw utils::syntax_error( current.location, msg.str() );
     }
 
     std::vector< lexer::token > parser::parse_identifier_list()
@@ -117,6 +192,7 @@ namespace lorraine::parser
     {
         auto name_str = std::string{ name.begin(), name.end() };
         auto dir = utils::io::get_dir( this->name );
+
         auto full_name = dir + name_str + ".lua";
 
         // Check if module actually exists
@@ -145,7 +221,7 @@ namespace lorraine::parser
         expect( lexer::token_type::identifier );
 
         // Get the name and continue
-        const auto& name = lexer.current().value;
+        const auto name = lexer.current().value;
         lexer.next();
 
         expect( lexer::token_type::sym_equals, true );
