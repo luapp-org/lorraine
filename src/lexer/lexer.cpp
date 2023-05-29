@@ -255,7 +255,7 @@ namespace lorraine::lexer
                     }
 
                     throw utils::syntax_error(
-                        utils::location{ start, current_position() }, L"unrecognized character" );
+                        utils::location{ start, current_position() }, L"unrecognized character " );
 
                     consume_character();
                     return;

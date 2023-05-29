@@ -191,6 +191,13 @@ namespace lorraine::parser
         const std::wstring_view& name )
     {
         auto name_str = std::string{ name.begin(), name.end() };
+
+        // TODO: Refactor this code
+        if ( name_str[ 0 ] != '.' )
+            throw utils::syntax_error(
+                loc,
+                L"Package imports are not supported. Please use the prefix './' for local modules" );
+
         auto dir = utils::io::get_dir( this->name );
 
         auto full_name = dir + name_str + ".lua";

@@ -1,1 +1,4 @@
-export type MyType = { n: number, s: string }
+export type MyType = { 
+    n: number, 
+    s: string 
+}

@@ -36,6 +36,8 @@ namespace lorraine::cli
 
         void callback();
         compiler::compiler_stage get_stage();
+        
+        std::wstring get_input();
 
         std::unordered_map< std::string_view, compiler::compiler_stage > stage_map = {
             { "lexer", compiler::compiler_stage::lexer },

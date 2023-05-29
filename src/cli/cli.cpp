@@ -38,11 +38,21 @@ namespace lorraine::cli
         if ( !config_file.empty() )
             cfg = config::load( config_file );
 
-        // This is really bad btw... Fix!!!
-        source =
-            input_file.empty() ? utils::io::read_console() : *utils::io::read_file( input_file );
+        source = get_input();
 
         std::locale::global( std::locale( cfg.get< std::string >( "locale" ) ) );
+    }
+
+    std::wstring cli::get_input()
+    {
+        // FileError
+        if ( input_file.empty() )
+            return utils::io::read_console();
+
+        if ( const auto content = utils::io::read_file( input_file ) )
+            return *content;
+
+        throw CLI::FileError::Missing( input_file );
     }
 
     int cli::parse()
@@ -59,7 +69,6 @@ namespace lorraine::cli
         compiler::compiler compiler( cfg );
 
         std::string name = input_file.empty() ? "stdin" : input_file;
-
         std::wstring output = compiler.compile( name, source, get_stage() ).str();
 
         if ( output_file.empty() )
