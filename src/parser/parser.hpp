@@ -17,9 +17,9 @@ namespace lorraine::parser
             compiler::compiler* compiler )
             : source( source ),
               lexer( source, compiler ),
-              compiler( compiler ),
-              name( name )
+              compiler( compiler )
         {
+            info = ast::module::information::get( name );
         }
 
         /// @brief Parses the source code into an abstract syntax tree
@@ -30,7 +30,7 @@ namespace lorraine::parser
         lexer::lexer lexer;
         compiler::compiler* compiler;
 
-        std::string name;
+        std::shared_ptr< ast::module::information > info = nullptr;
         std::wstring_view source;
 
         /// @brief Last block created and entered. Type and variable definitions will get added.
@@ -111,7 +111,7 @@ namespace lorraine::parser
         /// @return List of identifiers
         std::vector< lexer::token > parse_identifier_list();
 
-        /// @brief Parses an export statement. 
+        /// @brief Parses an export statement.
         /// @return Export statement
         std::unique_ptr< ast::export_item > parse_export();
     };

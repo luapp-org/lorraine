@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <memory>
 #include <optional>
 #include <unordered_map>
@@ -105,20 +106,30 @@ namespace lorraine::ast
     /// @brief An object that can be referenced from different files
     struct module : statement
     {
-        std::string path, name;
+        struct information
+        {
+            std::string directory, filename, name;
+
+            std::string absolute() const;
+
+            static std::shared_ptr< information > get( const std::string& path );
+        };
+
+        std::shared_ptr< information > info;
         std::unique_ptr< block > body;
 
-        explicit module( const std::string& path, std::unique_ptr< block > body )
+        explicit module( std::shared_ptr< information > info, std::unique_ptr< block > body )
             : statement( body->location ),
-              path( path ),
+              info( info ),
               body( std::move( body ) )
         {
-            name = get_module_name( path );
         }
 
-        void visit( visitor* v ) override;
+        static std::shared_ptr< information > get_information(
+            std::shared_ptr< information > relative,
+            const std::string& name );
 
-        static std::string get_module_name( std::string filename );
+        void visit( visitor* v ) override;
     };
 
     struct import : statement

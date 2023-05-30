@@ -13,11 +13,12 @@ namespace lorraine::parser
             root = parse_block();
 
             expect( lexer::token_type::eof );
-            return std::make_unique< ast::module >( name, std::move( root ) );
+
+            return std::make_unique< ast::module >( info, std::move( root ) );
         }
         catch ( const utils::syntax_error& e )
         {
-            compiler->llvm_display_error( name, source, e );
+            compiler->llvm_display_error( info->absolute(), source, e );
             return nullptr;
         }
     }
@@ -127,7 +128,8 @@ namespace lorraine::parser
                 else
                 {
                     std::wstringstream msg;
-                    msg << "unable to find export of '" << name << "' in " << module->path.c_str();
+                    msg << "unable to find export of '" << name << "' in "
+                        << module->info->filename.c_str();
 
                     throw utils::syntax_error( identifier.location, msg.str() );
                 }
@@ -190,30 +192,25 @@ namespace lorraine::parser
         const utils::location& loc,
         const std::wstring_view& name )
     {
-        auto name_str = std::string{ name.begin(), name.end() };
+        std::shared_ptr< ast::module::information > info =
+            ast::module::get_information( this->info, std::string{ name.begin(), name.end() } );
 
-        // TODO: Refactor this code
-        if ( name_str[ 0 ] != '.' )
+        if ( !info )
             throw utils::syntax_error(
-                loc,
-                L"Package imports are not supported. Please use the prefix './' for local modules" );
-
-        auto dir = utils::io::get_dir( this->name );
-
-        auto full_name = dir + name_str + ".lua";
+                loc, L"There was an issue parsing the module name. Use './' for local files." );
 
         // Check if module actually exists
-        auto source = utils::io::read_file( full_name );
+        auto source = utils::io::read_file( info->absolute() );
 
         if ( !source.has_value() )
         {
             std::wstringstream msg;
-            msg << "unable to open module '" << name_str.c_str() << "'";
+            msg << "unable to open file '" << info->absolute().c_str() << "'";
 
             throw utils::syntax_error( loc, msg.str() );
         }
 
-        parser parser{ full_name, *source, compiler };
+        parser parser{ info->absolute(), *source, compiler };
 
         return parser.parse();
     }

@@ -71,19 +71,6 @@ namespace lorraine::ast
             this->variables.emplace( variable->value, variable->type );
     }
 
-    std::string module::get_module_name( std::string filename )
-    {
-        if ( filename != "stdin" )
-        {
-            const auto last = filename.find_last_of( "/\\" ) + 1;
-            const auto len = filename.find_last_of( "." ) - last;
-
-            return filename.substr( last, len );
-        }
-
-        return filename;
-    }
-
     void import::visit( visitor* v )
     {
         if ( v->visit( this ) )
@@ -122,6 +109,55 @@ namespace lorraine::ast
     {
         if ( v->visit( this ) )
             expr->visit( v );
+    }
+
+    std::shared_ptr< module::information > module::information::get( const std::string& path )
+    {
+        std::shared_ptr< module::information > info = std::make_shared< module::information >();
+
+        if ( path == "stdin" )
+        {
+            info->name = path;
+            info->filename = path;
+            info->directory = path;
+        }
+        else
+        {
+            const std::size_t last_slash = path.find_last_of( "/\\" ) + 1;
+            const std::size_t last_period = path.find_last_of( ".\\" );
+
+            info->directory = path.substr( 0, last_slash );
+            info->filename = path.substr( last_slash, path.size() - last_slash );
+            info->name = path.substr( last_slash, last_period - last_slash );
+        }
+
+        return info;
+    }
+
+    std::string module::information::absolute() const
+    {
+        return directory + filename;
+    }
+
+    std::shared_ptr< module::information > module::get_information(
+        std::shared_ptr< information > relative,
+        const std::string& name )
+    {
+        std::shared_ptr< module::information > info = std::make_shared< module::information >();
+
+        // TODO: Add support for packages. These will just be referenced by their names not './' or
+        // '../'
+        if ( name[ 0 ] != '.' )
+            return nullptr;
+
+        const std::size_t last_slash = name.find_last_of( "/\\" ) + 1;
+        const auto file_directory = name.substr( 0, last_slash );
+
+        info->directory = relative->directory + ( file_directory == "./" ? "" : file_directory );
+        info->name = name.substr( last_slash, name.size() - last_slash );
+        info->filename = info->name + ".lua";
+
+        return info;
     }
 
 }  // namespace lorraine::ast
