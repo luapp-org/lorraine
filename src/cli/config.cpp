@@ -23,11 +23,18 @@ namespace lorraine::cli
 
         while ( std::getline( in, line ) )
         {
+            if ( line.empty() || line[ 0 ] == '#' )
+                continue;
+
             int colon;
             for ( colon = 0; line[ colon ] != ':'; ++colon )
                 ;
 
             const auto& item = line.substr( 0, colon );
+
+            // Skip whitespace after colon
+            if (line[colon + 1] == ' ')
+                ++colon;
 
             try
             {

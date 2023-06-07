@@ -41,8 +41,9 @@ namespace lorraine::compiler
             const std::wstring_view& source,
             const utils::syntax_error& error );
 
-       private:
         cli::config cfg;
+
+       private:
         std::wstring_view source;
 
         std::vector< std::shared_ptr< utils::error > > errors;

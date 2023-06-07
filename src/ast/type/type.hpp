@@ -35,7 +35,7 @@ namespace lorraine::ast::type
         /// @brief Compares the current type with another type
         /// @param t Other type
         /// @return True if equal
-        bool is( type t );
+        bool is( std::shared_ptr< type > t );
 
         /// @brief Converts a primitive type to a string
         /// @param t Primitive type

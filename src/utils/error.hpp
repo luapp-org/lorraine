@@ -100,4 +100,8 @@ namespace lorraine::utils
             return str.str();
         }
     };
+
+    struct type_error : error
+    {
+    };
 }  // namespace lorraine::utils

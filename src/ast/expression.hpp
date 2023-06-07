@@ -62,6 +62,16 @@ namespace lorraine::ast
         void visit( visitor* v ) override;
     };
 
+    struct nil_literal : expression
+    {
+        explicit nil_literal( const utils::location& location )
+            : expression( location )
+        {
+        }
+
+        void visit( visitor* v ) override;
+    };
+
     // Represents identifiers that cannot initially be mapped to a definition in the codebase.
     // Unresolved identifiers can be user defined functions, library methods, or simply unknown
     // idenfiers.

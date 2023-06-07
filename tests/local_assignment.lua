@@ -1,1 +1,1 @@
-local a: number = 1234
+local a: number, b: number = 134

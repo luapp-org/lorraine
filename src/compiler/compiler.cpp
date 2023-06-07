@@ -4,6 +4,7 @@
 #include <llvm/Support/Program.h>
 #include <llvm/Support/WithColor.h>
 
+#include "../ast/type/validator.hpp"
 #include "../lexer/lexer.hpp"
 #include "../parser/parser.hpp"
 
@@ -25,12 +26,20 @@ namespace lorraine::compiler
 
         parser::parser parser( name, source, this );
 
-        parser.parse();
+        const auto tree = parser.parse();
+
+        if (tree)
+        {
+            ast::type::validator::validate( tree.get(), this );
+        }
 
         return {};
     }
 
-    void compiler::llvm_display_error( const std::string& name, const std::wstring_view& source, const utils::syntax_error& error )
+    void compiler::llvm_display_error(
+        const std::string& name,
+        const std::wstring_view& source,
+        const utils::syntax_error& error )
     {
         llvm::errs() << name << ':' << error.location.start.line << ':'
                      << error.location.start.column + 1 << ": ";

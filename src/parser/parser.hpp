@@ -19,7 +19,7 @@ namespace lorraine::parser
               lexer( source, compiler ),
               compiler( compiler )
         {
-            info = ast::module::information::get( name );
+            info = ast::module::information::get( name, source );
         }
 
         /// @brief Parses the source code into an abstract syntax tree

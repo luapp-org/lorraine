@@ -39,4 +39,9 @@ namespace lorraine::ast
                 arg->visit( v );
         }
     }
+
+    void nil_literal::visit( visitor* v ) 
+    {
+        v->visit( this );
+    }
 }  // namespace lorraine::ast

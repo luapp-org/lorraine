@@ -67,7 +67,7 @@ namespace lorraine::cli
         }
 
         compiler::compiler compiler( cfg );
-
+    
         std::string name = input_file.empty() ? "stdin" : input_file;
         std::wstring output = compiler.compile( name, source, get_stage() ).str();
 

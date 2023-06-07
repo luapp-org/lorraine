@@ -109,10 +109,13 @@ namespace lorraine::ast
         struct information
         {
             std::string directory, filename, name;
+            std::wstring_view source;
 
             std::string absolute() const;
 
-            static std::shared_ptr< information > get( const std::string& path );
+            static std::shared_ptr< information > get(
+                const std::string& path,
+                std::wstring_view source );
         };
 
         std::shared_ptr< information > info;

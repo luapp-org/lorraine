@@ -53,6 +53,9 @@ namespace lorraine::cli
             { "locale", option_value{ std::string{ "C.UTF-8" } } },
             { "elapsedTime", option_value{ true } },
             { "detailedErrors", option_value{ true } },
+            
+            // Compiler flags (affect behavior of language)
+            { "imbalancedLocalAssignments", option_value{ true } },
         };
     };
 }  // namespace lorraine::cli

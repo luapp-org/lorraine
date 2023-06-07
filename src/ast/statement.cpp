@@ -111,9 +111,12 @@ namespace lorraine::ast
             expr->visit( v );
     }
 
-    std::shared_ptr< module::information > module::information::get( const std::string& path )
+    std::shared_ptr< module::information > module::information::get(
+        const std::string& path,
+        std::wstring_view source )
     {
         std::shared_ptr< module::information > info = std::make_shared< module::information >();
+        info->source = source;
 
         if ( path == "stdin" )
         {
@@ -156,6 +159,7 @@ namespace lorraine::ast
         info->directory = relative->directory + ( file_directory == "./" ? "" : file_directory );
         info->name = name.substr( last_slash, name.size() - last_slash );
         info->filename = info->name + ".lua";
+        
 
         return info;
     }

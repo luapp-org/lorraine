@@ -1,5 +1,7 @@
 #include "parser.hpp"
 
+#include <charconv>
+
 #include "../utils/utils.hpp"
 
 namespace lorraine::parser
@@ -210,6 +212,9 @@ namespace lorraine::parser
             throw utils::syntax_error( loc, msg.str() );
         }
 
+        // Set the source of the module
+        info->source = source.value();
+
         parser parser{ info->absolute(), *source, compiler };
 
         return parser.parse();
@@ -357,8 +362,12 @@ namespace lorraine::parser
         ast::variable_list variables;
 
         do
+        {
+            if ( variables.size() )
+                lexer.next();
+
             variables.push_back( parse_variable() );
-        while ( lexer.current().type == lexer::token_type::sym_comma );
+        } while ( lexer.current().type == lexer::token_type::sym_comma );
 
         return variables;
     }
@@ -368,31 +377,34 @@ namespace lorraine::parser
         ast::expression_list expressions;
 
         do
+        {
+            if ( expressions.size() )
+                lexer.next();
+
             expressions.push_back( parse_expression() );
-        while ( lexer.current().type == lexer::token_type::sym_comma );
+        } while ( lexer.current().type == lexer::token_type::sym_comma );
 
         return expressions;
     }
 
     std::unique_ptr< ast::expression > parser::parse_expression()
     {
-        const auto start = lexer.current().location.start;
+        const auto current = lexer.current();
+        const auto start = current.location.start;
 
-        switch ( lexer.current().type )
+        switch ( current.type )
         {
             case lexer::token_type::number:
             {
-                // omg ew why would anyone use c stuff
-                errno = 0;
-                wchar_t* end;
+                double value;
 
-                const wchar_t* data = lexer.current().value.data();
-                lexer.next();
+                const std::wstring data = std::wstring{ current.value };
 
-                double value = wcstof32x( data, &end );
-
-                // Check for errors
-                if ( errno || *data == L'\0' || *end != L'\0' )
+                try
+                {
+                    value = std::stod( data );
+                }
+                catch ( const std::invalid_argument& e )
                 {
                     std::wstringstream message;
                     message << L"Unable to convert '" << data << "' to a number";
@@ -401,10 +413,19 @@ namespace lorraine::parser
                         utils::location{ start, lexer.current().location.end }, message.str() );
                 }
 
-                return std::make_unique< ast::number_literal >( lexer.current().location, value );
+                lexer.next();
+
+                return std::make_unique< ast::number_literal >( current.location, value );
             }
 
-            default: break;
+            default:
+            {
+                std::wstringstream stream;
+                stream << L"unexpected token '" << current.to_string()
+                       << L"' when parsing expression";
+
+                throw utils::syntax_error( current.location, stream.str() );
+            }
         }
 
         return nullptr;

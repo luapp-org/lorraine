@@ -31,12 +31,12 @@ namespace lorraine::ast::type
         return false;
     }
 
-    bool type::is( type t )
+    bool type::is( std::shared_ptr< type >  t )
     {
-        if ( const auto prim = std::get_if< primitive_type >( &t.value ) )
+        if ( const auto prim = std::get_if< primitive_type >( &t->value ) )
             return is( *prim );
 
-        if ( const auto table = std::get_if< table_descriptor >( &t.value ) )
+        if ( const auto table = std::get_if< table_descriptor >( &t->value ) )
             return is( *table );
 
         return false;
