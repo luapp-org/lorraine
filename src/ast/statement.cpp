@@ -20,7 +20,7 @@ namespace lorraine::ast
         }
     }
 
-    std::shared_ptr< type::type > block::get_type( const std::wstring_view& name )
+    std::shared_ptr< type::type > block::get_type( const std::string_view& name )
     {
         const auto it = types.find( name );
 
@@ -33,7 +33,7 @@ namespace lorraine::ast
         return it->second;
     }
 
-    std::shared_ptr< type::type > block::get_export_type( const std::wstring_view& name )
+    std::shared_ptr< type::type > block::get_export_type( const std::string_view& name )
     {
         const auto it = export_types.find( name );
 
@@ -82,7 +82,7 @@ namespace lorraine::ast
         }
     }
 
-    std::shared_ptr< type::type > block::get_variable_type( const std::wstring_view& name )
+    std::shared_ptr< type::type > block::get_variable_type( const std::string_view& name )
     {
         const auto it = variables.find( name );
 
@@ -95,7 +95,7 @@ namespace lorraine::ast
         return it->second;
     }
 
-    std::shared_ptr< type::type > block::get_export_variable_type( const std::wstring_view& name )
+    std::shared_ptr< type::type > block::get_export_variable_type( const std::string_view& name )
     {
         const auto it = export_variables.find( name );
 
@@ -113,7 +113,7 @@ namespace lorraine::ast
 
     std::shared_ptr< module::information > module::information::get(
         const std::string& path,
-        std::wstring_view source )
+        std::string_view source )
     {
         std::shared_ptr< module::information > info = std::make_shared< module::information >();
         info->source = source;

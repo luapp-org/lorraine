@@ -24,14 +24,14 @@ namespace lorraine::ast::type
 
     bool validator::visit( local_assignment* node )
     {
+        const auto location = utils::location{
+            node->values.front()->location.start,
+            node->values.back()->location.end,
+        };
+
         if ( node->values.size() > node->variables.size() )
         {
-            const auto location = utils::location{
-                node->values.front()->location.start,
-                node->values.back()->location.end,
-            };
-
-            throw utils::syntax_error( location, L"Too many values in local assignment" );
+            throw utils::syntax_error( location, "Too many values in local assignment" );
 
             return false;
         }
@@ -40,12 +40,7 @@ namespace lorraine::ast::type
         {
             if ( !compiler->cfg.get< bool >( "imbalancedLocalAssignments" ) )
             {
-                const auto location = utils::location{
-                    node->values.front()->location.start,
-                    node->values.back()->location.end,
-                };
-
-                throw utils::syntax_error( location, L"Too few values in local assignment" );
+                throw utils::syntax_error( location, "Too few values in local assignment" );
 
                 return false;
             }
@@ -67,6 +62,16 @@ namespace lorraine::ast::type
 
             if ( !variable->type->is( value->type ) )
             {
+                std::stringstream stream;
+
+                stream << "type mismatch; unable to assign variable of type '"
+                       << variable->type->to_string() << "' a value of type '"
+                       << value->type->to_string() << "'";
+
+                throw utils::syntax_error(
+                    variable->location, stream.str() );
+
+                return false;
             }
         }
 

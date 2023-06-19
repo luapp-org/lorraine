@@ -11,9 +11,9 @@ namespace lorraine::utils
 {
     struct io
     {
-        static std::optional< std::wstring > read_file( const std::string& filename );
+        static std::optional< std::string > read_file( const std::string& filename );
 
-        static std::wstring read_console();
+        static std::string read_console();
 
         static std::string get_dir( const std::string& path );
     };

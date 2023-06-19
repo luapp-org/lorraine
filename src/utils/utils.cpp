@@ -2,26 +2,26 @@
 
 namespace lorraine::utils
 {
-    std::optional< std::wstring > io::read_file( const std::string& filename )
+    std::optional< std::string > io::read_file( const std::string& filename )
     {
         if ( filename.empty() )
             return std::nullopt;
 
-        std::wifstream wif( filename );
+        std::ifstream input( filename );
 
-        if (wif.fail())
+        if (input.fail())
             return std::nullopt;
 
-        std::wstringstream wss;
-        wss << wif.rdbuf();
+        std::stringstream wss;
+        wss << input.rdbuf();
         return wss.str();
     }
 
-    std::wstring io::read_console()
+    std::string io::read_console()
     {
-        std::wstring out;
+        std::string out;
         std::cout << "> ";
-        std::getline( std::wcin, out );
+        std::getline( std::cin, out );
 
         return out;
     }

@@ -94,110 +94,110 @@ namespace lorraine::lexer
     struct token
     {
         token_type type = token_type::eof;
-        std::wstring_view value{};  // wstring for unicode support
+        std::string_view value{};  
         utils::location location{};
 
         /// @brief Returns a string representation of the token type provided
         /// @param type Token type
         /// @return String representation
-        static std::wstring to_string( const token_type type )
+        static std::string to_string( const token_type type )
         {
             switch ( type )
             {
-                case token_type::string: return L"<string>";
-                case token_type::number: return L"<number>";
-                case token_type::boolean: return L"<boolean>";
-                case token_type::identifier: return L"<identifier>";
-                case token_type::eof: return L"<eof>";
+                case token_type::string: return "<string>";
+                case token_type::number: return "<number>";
+                case token_type::boolean: return "<boolean>";
+                case token_type::identifier: return "<identifier>";
+                case token_type::eof: return "<eof>";
 
-                case token_type::kw_and: return L"and";
-                case token_type::kw_break: return L"break";
-                case token_type::kw_do: return L"do";
-                case token_type::kw_else: return L"else";
-                case token_type::kw_elseif: return L"elseif";
-                case token_type::kw_end: return L"end";
-                case token_type::kw_false: return L"false";
-                case token_type::kw_for: return L"for";
-                case token_type::kw_function: return L"function";
-                case token_type::kw_if: return L"if";
-                case token_type::kw_in: return L"in";
-                case token_type::kw_local: return L"local";
-                case token_type::kw_nil: return L"nil";
-                case token_type::kw_not: return L"not";
-                case token_type::kw_or: return L"or";
-                case token_type::kw_repeat: return L"repeat";
-                case token_type::kw_return: return L"return";
-                case token_type::kw_then: return L"then";
-                case token_type::kw_true: return L"true";
-                case token_type::kw_const: return L"const";
-                case token_type::kw_until: return L"until";
-                case token_type::kw_while: return L"while";
-                case token_type::kw_import: return L"import";
-                case token_type::kw_export: return L"export";
-                case token_type::kw_from: return L"from";
-                case token_type::kw_type: return L"type";
+                case token_type::kw_and: return "and";
+                case token_type::kw_break: return "break";
+                case token_type::kw_do: return "do";
+                case token_type::kw_else: return "else";
+                case token_type::kw_elseif: return "elseif";
+                case token_type::kw_end: return "end";
+                case token_type::kw_false: return "false";
+                case token_type::kw_for: return "for";
+                case token_type::kw_function: return "function";
+                case token_type::kw_if: return "if";
+                case token_type::kw_in: return "in";
+                case token_type::kw_local: return "local";
+                case token_type::kw_nil: return "nil";
+                case token_type::kw_not: return "not";
+                case token_type::kw_or: return "or";
+                case token_type::kw_repeat: return "repeat";
+                case token_type::kw_return: return "return";
+                case token_type::kw_then: return "then";
+                case token_type::kw_true: return "true";
+                case token_type::kw_const: return "const";
+                case token_type::kw_until: return "until";
+                case token_type::kw_while: return "while";
+                case token_type::kw_import: return "import";
+                case token_type::kw_export: return "export";
+                case token_type::kw_from: return "from";
+                case token_type::kw_type: return "type";
 
-                case token_type::sym_plus: return L"+";
-                case token_type::sym_min: return L"-";
-                case token_type::sym_mul: return L"*";
-                case token_type::sym_div: return L"/";
-                case token_type::sym_mod: return L"%";
-                case token_type::sym_pow: return L"^";
-                case token_type::sym_g: return L">";
-                case token_type::sym_l: return L"<";
-                case token_type::sym_len: return L"#";
-                case token_type::sym_dot: return L".";
-                case token_type::sym_colon: return L":";
-                case token_type::sym_equals: return L"=";
-                case token_type::sym_comma: return L",";
-                case token_type::sym_lparen: return L"(";
-                case token_type::sym_rparen: return L")";
-                case token_type::sym_rbracket: return L"]";
-                case token_type::sym_lbracket: return L"[";
-                case token_type::sym_lbrace: return L"{";
-                case token_type::sym_rbrace: return L"}";
-                case token_type::sym_wiggle: return L"~";
-                case token_type::sym_question: return L"?";
+                case token_type::sym_plus: return "+";
+                case token_type::sym_min: return "-";
+                case token_type::sym_mul: return "*";
+                case token_type::sym_div: return "/";
+                case token_type::sym_mod: return "%";
+                case token_type::sym_pow: return "^";
+                case token_type::sym_g: return ">";
+                case token_type::sym_l: return "<";
+                case token_type::sym_len: return "#";
+                case token_type::sym_dot: return ".";
+                case token_type::sym_colon: return ":";
+                case token_type::sym_equals: return "=";
+                case token_type::sym_comma: return ",";
+                case token_type::sym_lparen: return "(";
+                case token_type::sym_rparen: return ")";
+                case token_type::sym_rbracket: return "]";
+                case token_type::sym_lbracket: return "[";
+                case token_type::sym_lbrace: return "{";
+                case token_type::sym_rbrace: return "}";
+                case token_type::sym_wiggle: return "~";
+                case token_type::sym_question: return "?";
 
-                case token_type::cmb_eq: return L"==";
-                case token_type::cmb_ge: return L">=";
-                case token_type::cmb_le: return L"<=";
-                case token_type::cmb_ne: return L"~=";
-                case token_type::cmb_concat: return L"..";
-                case token_type::cmb_vararg: return L"...";
-                case token_type::cmb_inc: return L"++";
-                case token_type::cmb_dec: return L"--";
-                case token_type::cmb_comppe: return L"+=";
-                case token_type::cmb_compse: return L"-=";
-                case token_type::cmb_compme: return L"*=";
-                case token_type::cmb_compde: return L"/=";
-                case token_type::cmb_compmoe: return L"%=";
-                case token_type::cmb_comppoe: return L"^=";
-                case token_type::cmb_compce: return L"..=";
-                case token_type::cmb_arrow: return L"->";
+                case token_type::cmb_eq: return "==";
+                case token_type::cmb_ge: return ">=";
+                case token_type::cmb_le: return "<=";
+                case token_type::cmb_ne: return "~=";
+                case token_type::cmb_concat: return "..";
+                case token_type::cmb_vararg: return "...";
+                case token_type::cmb_inc: return "++";
+                case token_type::cmb_dec: return "--";
+                case token_type::cmb_comppe: return "+=";
+                case token_type::cmb_compse: return "-=";
+                case token_type::cmb_compme: return "*=";
+                case token_type::cmb_compde: return "/=";
+                case token_type::cmb_compmoe: return "%=";
+                case token_type::cmb_comppoe: return "^=";
+                case token_type::cmb_compce: return "..=";
+                case token_type::cmb_arrow: return "->";
 
-                default: return L"<unknown>";
+                default: return "<unknown>";
             }
         }
 
         /// @brief Returns a string representation of the current token
         /// @return String representation, must accept return value
-        [[nodiscard]] std::wstring to_string() const
+        [[nodiscard]] std::string to_string() const
         {
             switch ( type )
             {
                 case token_type::number:
                 case token_type::boolean:
                 {
-                    return std::wstring{ value.cbegin(), value.cend() };
+                    return std::string{ value.cbegin(), value.cend() };
                 }
                 case token_type::string:
                 {
-                    return L"\"" + std::wstring{ value.cbegin(), value.cend() } + L"\"";
+                    return "\"" + std::string{ value.cbegin(), value.cend() } + "\"";
                 }
                 case token_type::identifier:
                 {
-                    return L"'" + std::wstring{ value.cbegin(), value.cend() } + L"'";
+                    return "'" + std::string{ value.cbegin(), value.cend() } + "'";
                 }
             }
 

@@ -38,9 +38,9 @@ namespace lorraine::ast
 
     struct string_literal : expression
     {
-        std::wstring value;
+        std::string value;
 
-        explicit string_literal( const utils::location& location, const std::wstring& value )
+        explicit string_literal( const utils::location& location, const std::string& value )
             : expression( location ),
               value( value )
         {
@@ -64,8 +64,7 @@ namespace lorraine::ast
 
     struct nil_literal : expression
     {
-        explicit nil_literal( const utils::location& location )
-            : expression( location )
+        explicit nil_literal( const utils::location& location ) : expression( location )
         {
         }
 
@@ -77,9 +76,9 @@ namespace lorraine::ast
     // idenfiers.
     struct unresolved_identifier : expression
     {
-        std::wstring value;
+        std::string value;
 
-        explicit unresolved_identifier( const utils::location& location, const std::wstring& value )
+        explicit unresolved_identifier( const utils::location& location, const std::string& value )
             : expression( location ),
               value( value )
         {
@@ -90,11 +89,11 @@ namespace lorraine::ast
 
     struct type_wrapper : expression
     {
-        std::wstring name;
+        std::string name;
 
         explicit type_wrapper(
             const utils::location& location,
-            const std::wstring& name,
+            const std::string& name,
             std::shared_ptr< type::type > type )
             : expression( location ),
               name( name )
@@ -109,11 +108,16 @@ namespace lorraine::ast
     /// definition. Used in local assignments and references.
     struct variable
     {
-        std::wstring value;
+        std::string value;
         std::shared_ptr< type::type > type;
+        utils::location location;
 
-        explicit variable( const std::wstring& value, std::shared_ptr< type::type > type )
-            : value( value ),
+        explicit variable(
+            const utils::location& location,
+            const std::string& value,
+            std::shared_ptr< type::type > type )
+            : location( location ),
+              value( value ),
               type( type )
         {
         }
@@ -157,12 +161,12 @@ namespace lorraine::ast
     /// @brief Represents a type alias definition in the AST. `type' Name = type
     struct type_alias_definition : expression
     {
-        std::wstring_view name;
+        std::string_view name;
         std::shared_ptr< ast::type::type > type;
 
         explicit type_alias_definition(
             const utils::location& location,
-            const std::wstring_view& name,
+            const std::string_view& name,
             std::shared_ptr< ast::type::type > type )
             : expression( location ),
               name( name ),
@@ -171,6 +175,13 @@ namespace lorraine::ast
         }
 
         void visit( visitor* v ) override;
+    };
+
+    /// @brief A function prototype. Includes only the first line of the function definition:
+    /// func(arg1: type, arg2: type): type
+    struct function_prototype : expression
+    {
+
     };
 
 }  // namespace lorraine::ast

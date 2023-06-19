@@ -1,1 +1,1 @@
-local a: number, b: number = 134
+local a: number = "string"

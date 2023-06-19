@@ -14,7 +14,7 @@ namespace lorraine::lexer
         /// @brief Constructs a new lexer instance based on a source string
         /// @param source The code to tokenize
         /// @param compiler Main compiler instance
-        explicit lexer( const std::wstring_view& source, compiler::compiler* compiler )
+        explicit lexer( const std::string_view& source, compiler::compiler* compiler )
             : source( source ),
               compiler( compiler )
         {
@@ -37,10 +37,10 @@ namespace lorraine::lexer
 
         /// @brief Dumps all tokens to the console
         /// @returns The output stream the tokens will be sent to
-        std::wstringstream print_tokens();
+        std::stringstream print_tokens();
 
        private:
-        std::wstring_view source{};
+        std::string_view source{};
         compiler::compiler* compiler;
 
         token t;
@@ -69,41 +69,41 @@ namespace lorraine::lexer
         void skip_comment();
 
         // Keyword dictionary
-        std::unordered_map< std::wstring_view, token_type > keyword_map = {
-            { L"and", token_type::kw_and },
-            { L"break", token_type::kw_break },
-            { L"do", token_type::kw_do },
-            { L"else", token_type::kw_else },
-            { L"elseif", token_type::kw_elseif },
-            { L"end", token_type::kw_end },
-            { L"false", token_type::kw_false },
-            { L"true", token_type::kw_true },
-            { L"for", token_type::kw_for },
-            { L"function", token_type::kw_function },
-            { L"if", token_type::kw_if },
-            { L"in", token_type::kw_in },
-            { L"local", token_type::kw_local },
-            { L"nil", token_type::kw_nil },
-            { L"not", token_type::kw_not },
-            { L"repeat", token_type::kw_repeat },
-            { L"return", token_type::kw_return },
-            { L"then", token_type::kw_then },
-            { L"until", token_type::kw_until },
-            { L"const", token_type::kw_const },
-            { L"class", token_type::kw_class },
-            { L"constructor", token_type::kw_constructor },
-            { L"implicit", token_type::kw_implicit },
-            { L"type", token_type::kw_type },
-            { L"import", token_type::kw_import },
-            { L"export", token_type::kw_export },
-            { L"from", token_type::kw_from },
-            { L"while", token_type::kw_while },
+        std::unordered_map< std::string_view, token_type > keyword_map = {
+            { "and", token_type::kw_and },
+            { "break", token_type::kw_break },
+            { "do", token_type::kw_do },
+            { "else", token_type::kw_else },
+            { "elseif", token_type::kw_elseif },
+            { "end", token_type::kw_end },
+            { "false", token_type::kw_false },
+            { "true", token_type::kw_true },
+            { "for", token_type::kw_for },
+            { "function", token_type::kw_function },
+            { "if", token_type::kw_if },
+            { "in", token_type::kw_in },
+            { "local", token_type::kw_local },
+            { "nil", token_type::kw_nil },
+            { "not", token_type::kw_not },
+            { "repeat", token_type::kw_repeat },
+            { "return", token_type::kw_return },
+            { "then", token_type::kw_then },
+            { "until", token_type::kw_until },
+            { "const", token_type::kw_const },
+            { "class", token_type::kw_class },
+            { "constructor", token_type::kw_constructor },
+            { "implicit", token_type::kw_implicit },
+            { "type", token_type::kw_type },
+            { "import", token_type::kw_import },
+            { "export", token_type::kw_export },
+            { "from", token_type::kw_from },
+            { "while", token_type::kw_while },
         };
 
         std::unordered_map< wchar_t, token_type > symbol_map = {
-            { L'?', token_type::sym_question }, { L'{', token_type::sym_lbrace },
-            { L'}', token_type::sym_rbrace },   { L':', token_type::sym_colon },
-            { L',', token_type::sym_comma },
+            { '?', token_type::sym_question }, { '{', token_type::sym_lbrace },
+            { '}', token_type::sym_rbrace },   { ':', token_type::sym_colon },
+            { ',', token_type::sym_comma },
         };
     };
 }  // namespace lorraine::lexer

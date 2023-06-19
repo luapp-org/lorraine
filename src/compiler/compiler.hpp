@@ -31,20 +31,20 @@ namespace lorraine::compiler
         /// @param source Code to compile
         /// @param stage Stage the compiler will stop at and generate output for
         /// @return Output stream
-        std::wstringstream compile(
+        std::stringstream compile(
             const std::string& name,
-            const std::wstring_view& source,
+            const std::string_view& source,
             compiler_stage stage = compiler_stage::codegen );
 
         void llvm_display_error(
             const std::string& name,
-            const std::wstring_view& source,
+            const std::string_view& source,
             const utils::syntax_error& error );
 
         cli::config cfg;
 
        private:
-        std::wstring_view source;
+        std::string_view source;
 
         std::vector< std::shared_ptr< utils::error > > errors;
     };

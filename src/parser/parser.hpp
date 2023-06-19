@@ -13,7 +13,7 @@ namespace lorraine::parser
         /// @brief Initializes a new parser class instance
         explicit parser(
             const std::string& name,
-            const std::wstring_view& source,
+            const std::string_view& source,
             compiler::compiler* compiler )
             : source( source ),
               lexer( source, compiler ),
@@ -31,7 +31,7 @@ namespace lorraine::parser
         compiler::compiler* compiler;
 
         std::shared_ptr< ast::module::information > info = nullptr;
-        std::wstring_view source;
+        std::string_view source;
 
         /// @brief Last block created and entered. Type and variable definitions will get added.
         ast::block* last_block = nullptr;
@@ -52,7 +52,7 @@ namespace lorraine::parser
         /// @return The new module
         std::unique_ptr< ast::module > get_module(
             const utils::location& loc,
-            const std::wstring_view& name );
+            const std::string_view& name );
 
         /// @brief Parses a block (list of statements)
         /// @return New block

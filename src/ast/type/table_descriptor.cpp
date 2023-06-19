@@ -11,15 +11,15 @@ namespace lorraine::ast::type
         return property.name == name && property.is_optional == is_optional && property.t->is( t );
     }
 
-    std::wstring table_descriptor::to_string() const
+    std::string table_descriptor::to_string() const
     {
-        std::wstringstream stream;
-        stream << L'{' << '\n';
+        std::stringstream stream;
+        stream << '{' << '\n';
 
         for ( const auto& property : properties )
-            stream << L"   " << property.name << L": " << property.t->to_string() << ",\n";
+            stream << "   " << property.name << ": " << property.t->to_string() << ",\n";
 
-        stream << L'}';
+        stream << '}';
 
         return stream.str();
     }

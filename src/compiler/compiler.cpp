@@ -10,9 +10,9 @@
 
 namespace lorraine::compiler
 {
-    std::wstringstream compiler::compile(
+    std::stringstream compiler::compile(
         const std::string& name,
-        const std::wstring_view& source,
+        const std::string_view& source,
         compiler_stage stage )
     {
         this->source = source;
@@ -38,14 +38,14 @@ namespace lorraine::compiler
 
     void compiler::llvm_display_error(
         const std::string& name,
-        const std::wstring_view& source,
+        const std::string_view& source,
         const utils::syntax_error& error )
     {
         llvm::errs() << name << ':' << error.location.start.line << ':'
                      << error.location.start.column + 1 << ": ";
         llvm::WithColor::error();
 
-        std::wcerr << error.msg;
+        std::cerr << error.msg;
 
         if ( cfg.get< bool >( "detailedErrors" ) )
         {

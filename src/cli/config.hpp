@@ -50,7 +50,7 @@ namespace lorraine::cli
 
        private:
         std::unordered_map< std::string_view, option_value > options = {
-            { "locale", option_value{ std::string{ "C.UTF-8" } } },
+            { "locale", option_value{ "" } },
             { "elapsedTime", option_value{ true } },
             { "detailedErrors", option_value{ true } },
             

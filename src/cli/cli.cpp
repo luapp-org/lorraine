@@ -43,7 +43,7 @@ namespace lorraine::cli
         std::locale::global( std::locale( cfg.get< std::string >( "locale" ) ) );
     }
 
-    std::wstring cli::get_input()
+    std::string cli::get_input()
     {
         // FileError
         if ( input_file.empty() )
@@ -69,13 +69,13 @@ namespace lorraine::cli
         compiler::compiler compiler( cfg );
     
         std::string name = input_file.empty() ? "stdin" : input_file;
-        std::wstring output = compiler.compile( name, source, get_stage() ).str();
+        std::string output = compiler.compile( name, source, get_stage() ).str();
 
         if ( output_file.empty() )
-            std::wcout << output;
+            std::cout << output;
         else
         {
-            std::wofstream out( output_file );
+            std::ofstream out( output_file );
             out << output;
         }
 

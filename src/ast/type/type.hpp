@@ -40,11 +40,11 @@ namespace lorraine::ast::type
         /// @brief Converts a primitive type to a string
         /// @param t Primitive type
         /// @return String
-        static std::wstring to_string( primitive_type t );
+        static std::string to_string( primitive_type t );
 
         /// @brief Converts the current type to a string
         /// @return String
-        [[nodiscard]] std::wstring to_string() const;
+        [[nodiscard]] std::string to_string() const;
 
         std::variant< primitive_type, table_descriptor > value;
 

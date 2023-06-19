@@ -40,12 +40,12 @@ namespace lorraine::ast
         statement_list body;
 
         // Data structures for the block's content
-        std::unordered_map< std::wstring_view, std::shared_ptr< type::type > > variables;
-        std::unordered_map< std::wstring_view, std::shared_ptr< type::type > > types;
+        std::unordered_map< std::string_view, std::shared_ptr< type::type > > variables;
+        std::unordered_map< std::string_view, std::shared_ptr< type::type > > types;
 
         // Exportable data types
-        std::unordered_map< std::wstring_view, std::shared_ptr< type::type > > export_variables;
-        std::unordered_map< std::wstring_view, std::shared_ptr< type::type > > export_types;
+        std::unordered_map< std::string_view, std::shared_ptr< type::type > > export_variables;
+        std::unordered_map< std::string_view, std::shared_ptr< type::type > > export_types;
 
         explicit block( const utils::location& location, statement_list body )
             : statement( location ),
@@ -57,11 +57,11 @@ namespace lorraine::ast
         {
         }
 
-        std::shared_ptr< type::type > get_type( const std::wstring_view& name );
-        std::shared_ptr< type::type > get_variable_type( const std::wstring_view& name );
+        std::shared_ptr< type::type > get_type( const std::string_view& name );
+        std::shared_ptr< type::type > get_variable_type( const std::string_view& name );
 
-        std::shared_ptr< type::type > get_export_type( const std::wstring_view& name );
-        std::shared_ptr< type::type > get_export_variable_type( const std::wstring_view& name );
+        std::shared_ptr< type::type > get_export_type( const std::string_view& name );
+        std::shared_ptr< type::type > get_export_variable_type( const std::string_view& name );
 
         void load_variable_list( variable_list variables );
 
@@ -109,13 +109,13 @@ namespace lorraine::ast
         struct information
         {
             std::string directory, filename, name;
-            std::wstring_view source;
+            std::string_view source;
 
             std::string absolute() const;
 
             static std::shared_ptr< information > get(
                 const std::string& path,
-                std::wstring_view source );
+                std::string_view source );
         };
 
         std::shared_ptr< information > info;

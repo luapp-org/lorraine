@@ -30,7 +30,7 @@ namespace lorraine::lexer
                     if ( !read_long_string( start ) )
                         throw utils::syntax_error(
                             utils::location{ start, current_position() },
-                            L"unfinished long string near <eof>" );
+                            "unfinished long string near <eof>" );
                 }
                 else
                 {
@@ -255,7 +255,7 @@ namespace lorraine::lexer
                     }
 
                     throw utils::syntax_error(
-                        utils::location{ start, current_position() }, L"unrecognized character " );
+                        utils::location{ start, current_position() }, "unrecognized character " );
 
                     consume_character();
                     return;
@@ -347,7 +347,7 @@ namespace lorraine::lexer
             if ( !read_long_string( start ) )
                 throw utils::syntax_error(
                     utils::location{ start, current_position() },
-                    L"unfinished long comment near <eof>" );
+                    "unfinished long comment near <eof>" );
         }
 
         while ( peek_character() == L'\n' || peek_character() == L'\r' && peek_character() != WEOF )
@@ -369,7 +369,7 @@ namespace lorraine::lexer
                 {
                     throw utils::syntax_error(
                         utils::location{ start, current_position() },
-                        L"unfinished string, expected closing quote" );
+                        "unfinished string, expected closing quote" );
                     return;
                 }
             }
@@ -450,9 +450,9 @@ namespace lorraine::lexer
         return delims;
     }
 
-    std::wstringstream lexer::print_tokens()
+    std::stringstream lexer::print_tokens()
     {
-        std::wstringstream out;
+        std::stringstream out;
         token token;
 
         do

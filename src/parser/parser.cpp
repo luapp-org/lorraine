@@ -65,7 +65,7 @@ namespace lorraine::parser
 
             default:
             {
-                std::wstringstream msg;
+                std::stringstream msg;
                 msg << "unexpected " << current.to_string() << " when parsing statement";
 
                 throw utils::syntax_error( current.location, msg.str() );
@@ -112,7 +112,7 @@ namespace lorraine::parser
                 if ( auto type = module->body->get_export_variable_type( name ) )
                 {
                     std::shared_ptr< ast::variable > var = std::make_shared< ast::variable >(
-                        std::wstring{ name.begin(), name.end() }, type );
+                        identifier.location, std::string{ name.begin(), name.end() }, type );
 
                     imports.push_back(
                         std::make_unique< ast::variable_reference >( identifier.location, var ) );
@@ -123,13 +123,13 @@ namespace lorraine::parser
                 else if ( auto type = module->body->get_export_type( name ) )
                 {
                     imports.push_back( std::make_unique< ast::type_wrapper >(
-                        identifier.location, std::wstring{ name.begin(), name.end() }, type ) );
+                        identifier.location, std::string{ name.begin(), name.end() }, type ) );
 
                     last_block->types.emplace( name, type );
                 }
                 else
                 {
-                    std::wstringstream msg;
+                    std::stringstream msg;
                     msg << "unable to find export of '" << name << "' in "
                         << module->info->filename.c_str();
 
@@ -146,7 +146,7 @@ namespace lorraine::parser
         if ( last_block->parent != nullptr )
             throw utils::syntax_error(
                 lexer.current().location,
-                L"exports are only allowed in the lowest scope level of the module" );
+                "exports are only allowed in the lowest scope level of the module" );
 
         const auto& start = lexer.current().location.start;
 
@@ -168,7 +168,7 @@ namespace lorraine::parser
             }
         }
 
-        std::wstringstream msg;
+        std::stringstream msg;
         msg << "unexpected " << current.to_string() << " when parsing export statement";
 
         throw utils::syntax_error( current.location, msg.str() );
@@ -192,21 +192,21 @@ namespace lorraine::parser
 
     std::unique_ptr< ast::module > parser::get_module(
         const utils::location& loc,
-        const std::wstring_view& name )
+        const std::string_view& name )
     {
         std::shared_ptr< ast::module::information > info =
             ast::module::get_information( this->info, std::string{ name.begin(), name.end() } );
 
         if ( !info )
             throw utils::syntax_error(
-                loc, L"There was an issue parsing the module name. Use './' for local files." );
+                loc, "There was an issue parsing the module name. Use './' for local files." );
 
         // Check if module actually exists
         auto source = utils::io::read_file( info->absolute() );
 
         if ( !source.has_value() )
         {
-            std::wstringstream msg;
+            std::stringstream msg;
             msg << "unable to open file '" << info->absolute().c_str() << "'";
 
             throw utils::syntax_error( loc, msg.str() );
@@ -254,7 +254,7 @@ namespace lorraine::parser
 
             default:
             {
-                std::wstringstream msg;
+                std::stringstream msg;
                 msg << "unexpected " << current.to_string() << " when parsing type reference";
 
                 throw utils::syntax_error( current.location, msg.str() );
@@ -311,7 +311,7 @@ namespace lorraine::parser
         if ( const auto type = last_block->get_type( current.value ) )
             return std::make_shared< ast::type::type >( *type );
 
-        std::wstringstream msg;
+        std::stringstream msg;
         msg << "the type '" << current.value << "' does not exist in the current context";
 
         throw utils::syntax_error( current.location, msg.str() );
@@ -323,23 +323,24 @@ namespace lorraine::parser
         auto& types = block->types;
 
         types.emplace(
-            L"string",
+            "string",
             std::make_shared< ast::type::type >( ast::type::type::primitive_type::string ) );
         types.emplace(
-            L"number",
+            "number",
             std::make_shared< ast::type::type >( ast::type::type::primitive_type::number ) );
         types.emplace(
-            L"boolean",
+            "boolean",
             std::make_shared< ast::type::type >( ast::type::type::primitive_type::boolean ) );
         types.emplace(
-            L"void",
-            std::make_shared< ast::type::type >( ast::type::type::primitive_type::void_ ) );
+            "void", std::make_shared< ast::type::type >( ast::type::type::primitive_type::void_ ) );
         types.emplace(
-            L"any", std::make_shared< ast::type::type >( ast::type::type::primitive_type::any ) );
+            "any", std::make_shared< ast::type::type >( ast::type::type::primitive_type::any ) );
     }
 
     std::shared_ptr< ast::variable > parser::parse_variable()
     {
+        const auto start = lexer.current().location.start;
+
         std::shared_ptr< ast::type::type > type = any_type;
 
         expect( lexer::token_type::identifier );
@@ -354,7 +355,10 @@ namespace lorraine::parser
             type = parse_type();
         }
 
-        return std::make_shared< ast::variable >( std::wstring{ name.begin(), name.end() }, type );
+        const auto end = lexer.current().location.end;
+
+        return std::make_shared< ast::variable >(
+            utils::location{ start, end }, std::string{ name.begin(), name.end() }, type );
     }
 
     ast::variable_list parser::parse_variable_list()
@@ -398,7 +402,7 @@ namespace lorraine::parser
             {
                 double value;
 
-                const std::wstring data = std::wstring{ current.value };
+                const std::string data = std::string{ current.value };
 
                 try
                 {
@@ -406,8 +410,8 @@ namespace lorraine::parser
                 }
                 catch ( const std::invalid_argument& e )
                 {
-                    std::wstringstream message;
-                    message << L"Unable to convert '" << data << "' to a number";
+                    std::stringstream message;
+                    message << "Unable to convert '" << data << "' to a number";
 
                     throw utils::syntax_error(
                         utils::location{ start, lexer.current().location.end }, message.str() );
@@ -420,9 +424,9 @@ namespace lorraine::parser
 
             default:
             {
-                std::wstringstream stream;
-                stream << L"unexpected token '" << current.to_string()
-                       << L"' when parsing expression";
+                std::stringstream stream;
+                stream << "unexpected token '" << current.to_string()
+                       << "' when parsing expression";
 
                 throw utils::syntax_error( current.location, stream.str() );
             }
@@ -457,8 +461,8 @@ namespace lorraine::parser
 
         if ( current_token.type != type )
         {
-            std::wstringstream message;
-            message << L"expected '" << lexer::token::to_string( type ) << L"', got '"
+            std::stringstream message;
+            message << "expected '" << lexer::token::to_string( type ) << "', got '"
                     << lexer.current().to_string() << "'";
 
             throw utils::syntax_error( current_token.location, message.str() );

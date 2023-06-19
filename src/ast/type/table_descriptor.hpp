@@ -17,14 +17,14 @@ namespace lorraine::ast::type
         // local variable where the type proceeds a ':'.
         struct table_property
         {
-            std::wstring_view name;
+            std::string_view name;
             std::shared_ptr< type > t;
 
             // Optional properties can be specified with a '?' after the property name.
             bool is_optional;
 
             explicit table_property(
-                const std::wstring_view& name,
+                const std::string_view& name,
                 std::shared_ptr< type > t,
                 bool is_optional )
                 : name( name ),
@@ -41,7 +41,7 @@ namespace lorraine::ast::type
 
         /// @brief Returns a string representation of the table descriptor
         /// @return New string representation
-        std::wstring to_string() const;
+        std::string to_string() const;
 
         std::vector< table_property > properties;
     };
