@@ -21,6 +21,7 @@ namespace lorraine::ast::type
             string,
             number,
             boolean,
+            nil,
             void_,
             any
         };

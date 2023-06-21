@@ -67,7 +67,7 @@ namespace lorraine::cli
         }
 
         compiler::compiler compiler( cfg );
-    
+
         std::string name = input_file.empty() ? "stdin" : input_file;
         std::string output = compiler.compile( name, source, get_stage() ).str();
 
@@ -88,8 +88,7 @@ namespace lorraine::cli
         if ( it != stage_map.end() )
             return it->second;
 
-        throw CLI::InvalidError(
-            "Unknown compiler stage, possible stages: lexer, parser, type, ir, and codegen" );
+        throw CLI::InvalidError( "Unknown compiler stage, possible stages: lexer, parser, type, ir, and codegen" );
     }
 }  // namespace lorraine::cli
 

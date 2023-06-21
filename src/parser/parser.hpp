@@ -128,5 +128,7 @@ namespace lorraine::parser
         /// @brief Parses function prototype
         /// @return New function prototype
         std::unique_ptr< ast::function_prototype > parse_function_prototype();
+
+        std::unique_ptr< ast::expression > parser::parse_function_call();
     };
 }  // namespace lorraine::parser

@@ -53,9 +53,7 @@ namespace lorraine::ast
     {
         bool value;
 
-        explicit boolean_literal( const utils::location& location, bool value )
-            : expression( location ),
-              value( value )
+        explicit boolean_literal( const utils::location& location, bool value ) : expression( location ), value( value )
         {
         }
 
@@ -142,9 +140,7 @@ namespace lorraine::ast
     {
         std::shared_ptr< variable > var;
 
-        explicit variable_reference(
-            const utils::location& location,
-            std::shared_ptr< variable > var )
+        explicit variable_reference( const utils::location& location, std::shared_ptr< variable > var )
             : expression( location ),
               var( var )
         {
@@ -168,6 +164,59 @@ namespace lorraine::ast
         {
         }
 
+        void visit( visitor* v ) override;
+    };
+
+    // Represents a name index, usually used to access a field in a table/class.
+    struct name_index : expression
+    {
+        std::unique_ptr< expression > variable;
+        std::string name;
+
+        explicit name_index(
+            const utils::location& location,
+            std::unique_ptr< expression > variable,
+            const std::string& name )
+            : expression( location ),
+              variable( std::move( variable ) ),
+              name( name )
+        {
+        }
+
+        void visit( visitor* v ) override;
+    };
+
+    // Represents an expression index, usually used to access a field in an array or hashtable
+    struct expression_index : expression
+    {
+        std::unique_ptr< expression > variable;
+        std::unique_ptr< expression > index;
+
+        explicit expression_index(
+            const utils::location& location,
+            std::unique_ptr< expression > variable,
+            std::unique_ptr< expression > index )
+            : expression( location ),
+              variable( std::move( variable ) ),
+              index( std::move( index ) )
+        {
+        }
+
+        void visit( visitor* v ) override;
+    };
+
+    // Represents an expression group (expression)
+    struct expression_group : expression
+    {
+        std::unique_ptr< expression > value;
+
+        explicit expression_group( const utils::location& location, std::unique_ptr< expression > value )
+            : expression( location ),
+              value( std::move( value ) )
+        {
+        }
+
+        // Visitor
         void visit( visitor* v ) override;
     };
 

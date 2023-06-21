@@ -33,6 +33,10 @@ namespace lorraine::ast
         visitor_definition( expression, call );
         visitor_definition( expression, type_alias_definition );
         visitor_definition( expression, function_prototype );
+        visitor_definition( expression, name_index );
+        visitor_definition( expression, expression_index );
+        visitor_definition( expression, nil_literal );
+        visitor_definition( expression, expression_group );
 
         // Register visitor patterns for statements
         visitor_definition( statement, block );

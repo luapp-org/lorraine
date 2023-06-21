@@ -19,7 +19,7 @@ namespace lorraine::code_generation
         value = builder.CreateGlobalString( llvm::StringRef( node->value.c_str() ) );
         return false;
     }
-
+    
     bool llvm_visitor::visit( ast::boolean_literal* node )
     {
         value = llvm::ConstantInt::get( builder.getContext(), llvm::APInt( 1, node->value ) );

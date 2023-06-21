@@ -20,8 +20,8 @@ namespace lorraine::ast::type
             if ( table->properties.size() != t.properties.size() )
                 return false;
 
-            // Iterate through each property and compare them. If any are not equal the descriptors
-            // are not identical.
+            // Iterate through each property and compare them. If any are not
+            // equal the descriptors are not identical.
             for ( std::size_t i = 0; i < t.properties.size(); ++i )
                 if ( !t.properties[ i ].is( table->properties[ i ] ) )
                     return false;
@@ -52,6 +52,7 @@ namespace lorraine::ast::type
             case primitive_type::boolean: return "boolean";
             case primitive_type::void_: return "void";
             case primitive_type::any: return "any";
+            case primitive_type::nil: return "nil";
 
             default: return "unknown";
         }

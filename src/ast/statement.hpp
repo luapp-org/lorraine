@@ -73,10 +73,7 @@ namespace lorraine::ast
         variable_list variables;
         expression_list values;
 
-        explicit local_assignment(
-            const utils::location& location,
-            variable_list variables,
-            expression_list values )
+        explicit local_assignment( const utils::location& location, variable_list variables, expression_list values )
             : statement( location ),
               variables( std::move( variables ) ),
               values( std::move( values ) )
@@ -113,9 +110,7 @@ namespace lorraine::ast
 
             std::string absolute() const;
 
-            static std::shared_ptr< information > get(
-                const std::string& path,
-                std::string_view source );
+            static std::shared_ptr< information > get( const std::string& path, std::string_view source );
         };
 
         std::shared_ptr< information > info;
@@ -157,9 +152,7 @@ namespace lorraine::ast
     {
         std::unique_ptr< ast::function_prototype > function;
 
-        explicit extern_item(
-            const utils::location& location,
-            std::unique_ptr< ast::function_prototype > function )
+        explicit extern_item( const utils::location& location, std::unique_ptr< ast::function_prototype > function )
             : statement( location ),
               function( std::move( function ) )
         {

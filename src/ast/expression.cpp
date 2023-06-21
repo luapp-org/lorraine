@@ -49,4 +49,26 @@ namespace lorraine::ast
     {
         v->visit( this );
     }
+
+    void name_index::visit( visitor* v )
+    {
+        if ( v->visit( this ) )
+            variable->visit( v );
+    }
+
+    void expression_index::visit( visitor* v ) 
+    {
+        if ( v->visit( this ) )
+        {
+            variable->visit( v );
+            index->visit( v );
+        }
+    }
+
+    // Visitor body for the expression group
+    void expression_group::visit( visitor* v )
+    {
+        if ( v->visit( this ) )
+            value->visit( v );
+    }
 }  // namespace lorraine::ast

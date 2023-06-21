@@ -477,6 +477,31 @@ namespace lorraine::parser
 
                 return std::make_unique< ast::number_literal >( current.location, value );
             }
+            case lexer::token_type::string:
+            {
+                const std::string data = std::string{ current.value };
+
+                lexer.next();
+
+                return std::make_unique< ast::string_literal >( current.location, data );
+            }
+            // Create boolean literal
+            case lexer::token_type::kw_true:
+            case lexer::token_type::kw_false:
+            {
+                const bool value = current.type == lexer::token_type::kw_true;
+
+                lexer.next();
+
+                return std::make_unique< ast::boolean_literal >( current.location, value );
+            }
+            // Create nil literal
+            case lexer::token_type::kw_nil:
+            {
+                lexer.next();
+
+                return std::make_unique< ast::nil_literal >( current.location );
+            }
 
             default:
             {
