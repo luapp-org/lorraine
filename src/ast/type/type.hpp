@@ -1,5 +1,8 @@
 #pragma once
 
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Type.h>
+
 #include <string>
 #include <string_view>
 #include <variant>
@@ -45,6 +48,11 @@ namespace lorraine::ast::type
         /// @brief Converts the current type to a string
         /// @return String
         [[nodiscard]] std::string to_string() const;
+
+        /// @brief Converts the current type to a llvm type pointer
+        /// @param context LLVM context
+        /// @return LLVM type ptr
+        llvm::Type *to_llvm_type( llvm::LLVMContext &context );
 
         std::variant< primitive_type, table_descriptor > value;
 

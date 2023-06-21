@@ -159,9 +159,14 @@ namespace lorraine::ast
         info->directory = relative->directory + ( file_directory == "./" ? "" : file_directory );
         info->name = name.substr( last_slash, name.size() - last_slash );
         info->filename = info->name + ".lua";
-        
 
         return info;
+    }
+
+    void extern_item::visit( visitor* v )
+    {
+        if ( v->visit( this ) )
+            function->visit( v );
     }
 
 }  // namespace lorraine::ast

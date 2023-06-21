@@ -152,4 +152,19 @@ namespace lorraine::ast
 
         void visit( visitor* v ) override;
     };
+
+    struct extern_item : statement
+    {
+        std::unique_ptr< ast::function_prototype > function;
+
+        explicit extern_item(
+            const utils::location& location,
+            std::unique_ptr< ast::function_prototype > function )
+            : statement( location ),
+              function( std::move( function ) )
+        {
+        }
+
+        void visit( visitor* v ) override;
+    };
 }  // namespace lorraine::ast

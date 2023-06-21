@@ -1,0 +1,1 @@
+extern printf(format: string, ...: any): number

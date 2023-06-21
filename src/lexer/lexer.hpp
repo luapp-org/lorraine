@@ -50,8 +50,8 @@ namespace lorraine::lexer
         std::uint32_t line_offset = 0;
 
         void consume_character();
-        [[nodiscard]] wchar_t peek_character( std::size_t count = 0 ) const;
-        [[nodiscard]] wchar_t get_character();
+        [[nodiscard]] char peek_character( std::size_t count = 0 ) const;
+        [[nodiscard]] char get_character();
         [[nodiscard]] utils::position current_position() const;
 
         const bool is_comment() const;
@@ -97,13 +97,15 @@ namespace lorraine::lexer
             { "import", token_type::kw_import },
             { "export", token_type::kw_export },
             { "from", token_type::kw_from },
+            { "extern", token_type::kw_extern },
             { "while", token_type::kw_while },
         };
 
-        std::unordered_map< wchar_t, token_type > symbol_map = {
+        std::unordered_map< char, token_type > symbol_map = {
             { '?', token_type::sym_question }, { '{', token_type::sym_lbrace },
             { '}', token_type::sym_rbrace },   { ':', token_type::sym_colon },
-            { ',', token_type::sym_comma },
+            { ',', token_type::sym_comma },    { '(', token_type::sym_lparen },
+            { ')', token_type::sym_rparen }
         };
     };
 }  // namespace lorraine::lexer

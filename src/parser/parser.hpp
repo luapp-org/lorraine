@@ -41,6 +41,12 @@ namespace lorraine::parser
         /// referenced in the code.
         std::shared_ptr< ast::type::type > any_type = std::make_shared< ast::type::type >();
 
+        /// @brief  Basic 'void' type. Used for functions that don't have an annoation for their
+        /// return type. This is also a member veriable for convenience, as a type instance of
+        /// 'void' is commonly referenced in the code.
+        std::shared_ptr< ast::type::type > void_type =
+            std::make_shared< ast::type::type >( ast::type::type::primitive_type::void_ );
+
         /// @brief Expects the current token to be of a certain type. Acts similarly to `assert`.
         /// @param type The expected type
         /// @param consume Tells the function to consume the following token
@@ -97,11 +103,11 @@ namespace lorraine::parser
 
         /// @brief Parses source code to a list of variable pointers
         /// @return List of variable pointers
-        ast::variable_list parse_variable_list();
+        ast::variable_list parse_variable_list( bool allow_variadic = false );
 
         /// @brief Parses a single variable from source code. Assigns type 'any' if not annotated.
         /// @return Variable pointer
-        std::shared_ptr< ast::variable > parse_variable();
+        std::shared_ptr< ast::variable > parse_variable( bool allow_variadic = false );
 
         /// @brief Parses an import statement and loads the referenced module.
         /// @return Import statement
@@ -114,5 +120,13 @@ namespace lorraine::parser
         /// @brief Parses an export statement.
         /// @return Export statement
         std::unique_ptr< ast::export_item > parse_export();
+
+        /// @brief Parses an extern statement (imports c functions)
+        /// @return New extern statement
+        std::unique_ptr< ast::extern_item > parse_extern();
+
+        /// @brief Parses function prototype
+        /// @return New function prototype
+        std::unique_ptr< ast::function_prototype > parse_function_prototype();
     };
 }  // namespace lorraine::parser

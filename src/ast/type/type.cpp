@@ -1,5 +1,6 @@
 #include "type.hpp"
 
+#include "../../utils/error.hpp"
 #include "table_descriptor.hpp"
 
 namespace lorraine::ast::type
@@ -31,7 +32,7 @@ namespace lorraine::ast::type
         return false;
     }
 
-    bool type::is( std::shared_ptr< type >  t )
+    bool type::is( std::shared_ptr< type > t )
     {
         if ( const auto prim = std::get_if< primitive_type >( &t->value ) )
             return is( *prim );
@@ -65,5 +66,30 @@ namespace lorraine::ast::type
             return ( *table ).to_string();
 
         return "unknown";
+    }
+
+    llvm::Type *type::to_llvm_type( llvm::LLVMContext &context )
+    {
+        if ( const auto prim = std::get_if< primitive_type >( &value ) )
+        {
+            switch ( *prim )
+            {
+                case primitive_type::number: return llvm::Type::getDoubleTy( context );
+                case primitive_type::void_: return llvm::Type::getVoidTy( context );
+
+                case primitive_type::boolean:
+                    return reinterpret_cast< llvm::Type * >( llvm::Type::getInt1Ty( context ) );
+
+                case primitive_type::string:
+                    return reinterpret_cast< llvm::Type * >( llvm::Type::getInt8PtrTy( context ) );
+
+                case primitive_type::any:
+                    throw utils::compiler_error( "unable to convert 'any' to LLVM type" );
+            }
+        }
+        else
+            throw utils::compiler_error( "Descriptors are not supported yet" );
+        
+        return nullptr;
     }
 }  // namespace lorraine::ast::type

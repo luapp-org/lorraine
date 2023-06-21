@@ -40,7 +40,12 @@ namespace lorraine::ast
         }
     }
 
-    void nil_literal::visit( visitor* v ) 
+    void nil_literal::visit( visitor* v )
+    {
+        v->visit( this );
+    }
+
+    void function_prototype::visit( visitor* v )
     {
         v->visit( this );
     }

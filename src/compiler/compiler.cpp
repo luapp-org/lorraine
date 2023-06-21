@@ -5,6 +5,7 @@
 #include <llvm/Support/WithColor.h>
 
 #include "../ast/type/validator.hpp"
+#include "../code_generation/code_generation.hpp"
 #include "../lexer/lexer.hpp"
 #include "../parser/parser.hpp"
 
@@ -26,11 +27,15 @@ namespace lorraine::compiler
 
         parser::parser parser( name, source, this );
 
-        const auto tree = parser.parse();
+        const auto main_module = parser.parse();
 
-        if (tree)
+        if ( main_module )
         {
-            ast::type::validator::validate( tree.get(), this );
+            ast::type::validator::validate( main_module.get(), this );
+
+            code_generation::code_generation gen{ main_module.get() };
+            std::shared_ptr< llvm::Module > main = gen.generate();
+            main->print( llvm::errs(), nullptr );
         }
 
         return {};

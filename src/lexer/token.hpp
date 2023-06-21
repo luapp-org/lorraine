@@ -38,6 +38,7 @@ namespace lorraine::lexer
         kw_import,
         kw_export,
         kw_from,
+        kw_extern,
         kw_while,
 
         // Symbols
@@ -136,6 +137,7 @@ namespace lorraine::lexer
                 case token_type::kw_export: return "export";
                 case token_type::kw_from: return "from";
                 case token_type::kw_type: return "type";
+                case token_type::kw_extern: return "extern";
 
                 case token_type::sym_plus: return "+";
                 case token_type::sym_min: return "-";

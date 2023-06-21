@@ -11,21 +11,21 @@ namespace lorraine::lexer
         consume_space_or_comment();
         const utils::position start = current_position();
 
-        switch ( wchar_t c = peek_character() )
+        switch ( char c = peek_character() )
         {
-            case WEOF:
+            case EOF:
                 t.type = token_type::eof;
                 t.location = { start, start };
                 break;
-            case L'\'':
-            case L'"':
+            case '\'':
+            case '"':
                 read_string( start );
 
                 consume_character();
                 break;
-            case L'[':
+            case '[':
                 // Start long string if next char is '['
-                if ( peek_character( 1 ) == L'[' )
+                if ( peek_character( 1 ) == '[' )
                 {
                     if ( !read_long_string( start ) )
                         throw utils::syntax_error(
@@ -39,10 +39,10 @@ namespace lorraine::lexer
                     consume_character();
                 }
                 break;
-            case L'=':
+            case '=':
                 consume_character();
 
-                if ( peek_character() == L'=' )
+                if ( peek_character() == '=' )
                 {
                     consume_character();
                     t.type = token_type::cmb_eq;
@@ -53,10 +53,10 @@ namespace lorraine::lexer
                 t.type = token_type::sym_equals;
                 t.location = { start, start };
                 break;
-            case L'>':
+            case '>':
                 consume_character();
 
-                if ( peek_character() == L'=' )
+                if ( peek_character() == '=' )
                 {
                     consume_character();
                     t.type = token_type::cmb_ge;
@@ -67,10 +67,10 @@ namespace lorraine::lexer
                 t.type = token_type::sym_g;
                 t.location = { start, start };
                 break;
-            case L'<':
+            case '<':
                 consume_character();
 
-                if ( peek_character() == L'=' )
+                if ( peek_character() == '=' )
                 {
                     consume_character();
                     t.type = token_type::cmb_le;
@@ -81,10 +81,10 @@ namespace lorraine::lexer
                 t.type = token_type::sym_l;
                 t.location = { start, start };
                 break;
-            case L'~':
+            case '~':
                 consume_character();
 
-                if ( peek_character() == L'=' )
+                if ( peek_character() == '=' )
                 {
                     consume_character();
                     t.type = token_type::cmb_ne;
@@ -95,9 +95,9 @@ namespace lorraine::lexer
                 t.type = token_type::sym_wiggle;
                 t.location = { start, start };
                 break;
-            case L'.':
+            case '.':
                 // Check if this is a decimal
-                if ( std::iswdigit( peek_character( 1 ) ) )
+                if ( std::isdigit( peek_character( 1 ) ) )
                 {
                     read_number( start );
                     break;
@@ -105,11 +105,11 @@ namespace lorraine::lexer
 
                 consume_character();
 
-                if ( peek_character() == L'.' )
+                if ( peek_character() == '.' )
                 {
                     consume_character();
 
-                    if ( peek_character() == L'.' )
+                    if ( peek_character() == '.' )
                     {
                         consume_character();
 
@@ -117,7 +117,7 @@ namespace lorraine::lexer
                         t.location = { start, current_position() };
                         break;
                     }
-                    else if ( peek_character() == L'=' )
+                    else if ( peek_character() == '=' )
                     {
                         consume_character();
 
@@ -134,10 +134,10 @@ namespace lorraine::lexer
                 t.type = token_type::sym_dot;
                 t.location = { start, start };
                 break;
-            case L'+':
+            case '+':
                 consume_character();
 
-                if ( peek_character() == L'+' )
+                if ( peek_character() == '+' )
                 {
                     consume_character();
                     t.type = token_type::cmb_inc;
@@ -155,14 +155,14 @@ namespace lorraine::lexer
                 t.type = token_type::sym_plus;
                 t.location = { start, start };
                 break;
-            case L'-':
-                if ( std::iswdigit( peek_character( 1 ) ) )
+            case '-':
+                if ( std::isdigit( peek_character( 1 ) ) )
                 {
                     read_number( start );
                     break;
                 }
 
-                if ( peek_character() == L'-' )
+                if ( peek_character() == '-' )
                 {
                     consume_character();
                     t.type = token_type::cmb_dec;
@@ -176,7 +176,7 @@ namespace lorraine::lexer
                     t.location = { start, current_position() };
                     break;
                 }
-                else if ( peek_character() == L'>' )
+                else if ( peek_character() == '>' )
                 {
                     consume_character();
                     t.type = token_type::cmb_arrow;
@@ -187,10 +187,10 @@ namespace lorraine::lexer
                 t.type = token_type::sym_min;
                 t.location = { start, start };
                 break;
-            case L'*':
+            case '*':
                 consume_character();
 
-                if ( peek_character() == L'=' )
+                if ( peek_character() == '=' )
                 {
                     consume_character();
                     t.type = token_type::cmb_compme;
@@ -201,10 +201,10 @@ namespace lorraine::lexer
                 t.type = token_type::sym_mul;
                 t.location = { start, start };
                 break;
-            case L'/':
+            case '/':
                 consume_character();
 
-                if ( peek_character() == L'=' )
+                if ( peek_character() == '=' )
                 {
                     consume_character();
                     t.type = token_type::cmb_compde;
@@ -215,10 +215,10 @@ namespace lorraine::lexer
                 t.type = token_type::sym_div;
                 t.location = { start, start };
                 break;
-            case L'^':
+            case '^':
                 consume_character();
 
-                if ( peek_character() == L'=' )
+                if ( peek_character() == '=' )
                 {
                     consume_character();
                     t.type = token_type::cmb_comppoe;
@@ -231,12 +231,12 @@ namespace lorraine::lexer
                 break;
             default:
             {
-                if ( std::iswdigit( c ) )
+                if ( std::isdigit( c ) )
                 {
                     read_number( start );
                     break;
                 }
-                else if ( std::iswalpha( c ) || c == L'_' )
+                else if ( std::isalpha( c ) || c == '_' )
                 {
                     read_identifier( start );
                     break;
@@ -254,8 +254,11 @@ namespace lorraine::lexer
                         break;
                     }
 
+                    std::stringstream msg;
+                    msg << "unrecognized character '" << c << "'";
+
                     throw utils::syntax_error(
-                        utils::location{ start, current_position() }, "unrecognized character " );
+                        utils::location{ start, current_position() }, msg.str());
 
                     consume_character();
                     return;
@@ -269,7 +272,7 @@ namespace lorraine::lexer
         const std::size_t start_offset = offset;
 
         // Consume all characters that qualify
-        while ( std::iswalnum( peek_character() ) || peek_character() == L'_' )
+        while ( std::iswalnum( peek_character() ) || peek_character() == '_' )
             consume_character();
 
         t.location = { start, current_position() };
@@ -283,16 +286,16 @@ namespace lorraine::lexer
             t.type = kw_iterator->second;
     }
 
-    wchar_t lexer::peek_character( std::size_t count ) const
+    char lexer::peek_character( std::size_t count ) const
     {
         if ( offset + count >= source.length() )
             return -1;
         return source[ offset + count ];
     }
 
-    wchar_t lexer::get_character()
+    char lexer::get_character()
     {
-        const wchar_t c = peek_character();
+        const char c = peek_character();
         consume_character();
 
         return c;
@@ -300,7 +303,7 @@ namespace lorraine::lexer
 
     void lexer::consume_character()
     {
-        if ( peek_character() == L'\n' )
+        if ( peek_character() == '\n' )
         {
             ++line;
             line_offset = ++offset;
@@ -317,7 +320,7 @@ namespace lorraine::lexer
 
     const bool lexer::is_comment() const
     {
-        return peek_character() == L'-' && peek_character( 1 ) == L'-';
+        return peek_character() == '-' && peek_character( 1 ) == '-';
     }
 
     void lexer::consume_space_or_comment()
@@ -340,7 +343,7 @@ namespace lorraine::lexer
         consume_character();
         consume_character();
 
-        if ( peek_character() == L'[' )
+        if ( peek_character() == '[' )
         {
             const utils::position start = current_position();
 
@@ -350,22 +353,22 @@ namespace lorraine::lexer
                     "unfinished long comment near <eof>" );
         }
 
-        while ( peek_character() == L'\n' || peek_character() == L'\r' && peek_character() != WEOF )
+        while ( peek_character() == '\n' || peek_character() == '\r' && peek_character() != WEOF )
             consume_character();
     }
 
     void lexer::read_string( const utils::position& start )
     {
-        const wchar_t quote = get_character();
+        const char quote = get_character();
         const auto start_offset = offset;
 
         while ( peek_character() != quote )
         {
             switch ( peek_character() )
             {
-                case WEOF:
-                case L'\n':
-                case L'\r':
+                case EOF:
+                case '\n':
+                case '\r':
                 {
                     throw utils::syntax_error(
                         utils::location{ start, current_position() },
@@ -386,7 +389,7 @@ namespace lorraine::lexer
         const std::size_t start_offset = offset;
         consume_character();
 
-        while ( std::iswdigit( peek_character() ) || peek_character() == L'.' )
+        while ( std::isdigit( peek_character() ) || peek_character() == '.' )
             consume_character();
 
         if ( peek_character() == 'e' || peek_character() == 'E' )
@@ -398,7 +401,7 @@ namespace lorraine::lexer
         }
 
         // Added for hexadecimal support, simplifies work in the parser
-        while ( std::iswdigit( peek_character() ) || std::iswalpha( peek_character() ) )
+        while ( std::isdigit( peek_character() ) || std::iswalpha( peek_character() ) )
             consume_character();
 
         t.location = { start, current_position() };
@@ -445,7 +448,7 @@ namespace lorraine::lexer
         {
             consume_character();
             ++delims;
-        } while ( peek_character() == L'=' );
+        } while ( peek_character() == '=' );
 
         return delims;
     }

@@ -68,10 +68,31 @@ namespace lorraine::ast::type
                        << variable->type->to_string() << "' a value of type '"
                        << value->type->to_string() << "'";
 
-                throw utils::syntax_error(
-                    variable->location, stream.str() );
+                throw utils::syntax_error( variable->location, stream.str() );
 
                 return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool validator::visit( function_prototype* node )
+    {
+        for ( std::size_t i = 0; i < node->args.size(); ++i )
+        {
+            const auto arg = node->args[ i ];
+
+            if ( auto v = dynamic_cast< variadic* >( arg.get() ) )
+            {
+                if ( i + 1 != node->args.size() )
+                    throw utils::syntax_error(
+                        arg->location, "variadic argument can only be last in the argument list" );
+                else
+                {
+                    node->vararg = v;
+                    node->args.pop_back();
+                }
             }
         }
 

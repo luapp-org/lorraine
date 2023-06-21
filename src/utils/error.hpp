@@ -13,9 +13,7 @@ namespace lorraine::utils
     {
         std::string msg;
 
-        explicit error( const std::string& msg )
-            : std::runtime_error( std::string{ msg.begin(), msg.end() } ),
-              msg( msg )
+        explicit error( const std::string& msg ) : std::runtime_error( msg ), msg( msg )
         {
         }
 
@@ -101,7 +99,10 @@ namespace lorraine::utils
         }
     };
 
-    struct type_error : error
+    struct compiler_error : error
     {
+        explicit compiler_error( const std::string& msg ) : error( msg )
+        {
+        }
     };
 }  // namespace lorraine::utils

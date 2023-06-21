@@ -32,6 +32,7 @@ namespace lorraine::ast
         visitor_definition( expression, variable_reference );
         visitor_definition( expression, call );
         visitor_definition( expression, type_alias_definition );
+        visitor_definition( expression, function_prototype );
 
         // Register visitor patterns for statements
         visitor_definition( statement, block );
@@ -40,5 +41,6 @@ namespace lorraine::ast
         visitor_definition( statement, export_item );
         visitor_definition( statement, module );
         visitor_definition( statement, import );
+        visitor_definition( statement, extern_item );
     };
 }  // namespace lorraine::ast

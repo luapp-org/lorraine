@@ -112,6 +112,10 @@ namespace lorraine::ast
         std::shared_ptr< type::type > type;
         utils::location location;
 
+        virtual ~variable()
+        {
+        }
+
         explicit variable(
             const utils::location& location,
             const std::string& value,
@@ -119,6 +123,15 @@ namespace lorraine::ast
             : location( location ),
               value( value ),
               type( type )
+        {
+        }
+    };
+
+    /// @brief Variadic variable, takes an arbitrary number of arguments.
+    struct variadic : variable
+    {
+        explicit variadic( const utils::location& location, std::shared_ptr< type::type > type )
+            : variable( location, std::string{}, type )
         {
         }
     };
@@ -178,10 +191,27 @@ namespace lorraine::ast
     };
 
     /// @brief A function prototype. Includes only the first line of the function definition:
-    /// func(arg1: type, arg2: type): type
     struct function_prototype : expression
     {
+        std::string name;
+        variable_list args;
+        std::shared_ptr< type::type > type;
 
+        explicit function_prototype(
+            const utils::location& location,
+            const std::string& name,
+            variable_list args,
+            std::shared_ptr< type::type > type )
+            : expression( location ),
+              name( name ),
+              args( std::move( args ) ),
+              type( type )
+        {
+        }
+
+        variadic* vararg = nullptr;
+
+        void visit( visitor* v ) override;
     };
 
 }  // namespace lorraine::ast

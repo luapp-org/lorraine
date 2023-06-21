@@ -31,6 +31,9 @@ add_executable(compiler
             src/ast/type/table_descriptor.cpp
             src/ast/type/validator.cpp
             src/parser/parser.cpp
+
+            src/code_generation/code_generation.cpp
+            src/code_generation/llvm_visitor.cpp
 )
 
 # Find the libraries that correspond to the LLVM components

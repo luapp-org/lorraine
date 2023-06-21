@@ -62,6 +62,7 @@ namespace lorraine::parser
             case lexer::token_type::kw_local: return parse_local_assignment();
             case lexer::token_type::kw_import: return parse_import();
             case lexer::token_type::kw_export: return parse_export();
+            case lexer::token_type::kw_extern: return parse_extern();
 
             default:
             {
@@ -172,6 +173,53 @@ namespace lorraine::parser
         msg << "unexpected " << current.to_string() << " when parsing export statement";
 
         throw utils::syntax_error( current.location, msg.str() );
+    }
+
+    std::unique_ptr< ast::extern_item > parser::parse_extern()
+    {
+        const auto start = lexer.current().location.start;
+
+        // Expect and consume the initial 'extern' statement
+        expect( lexer::token_type::kw_extern, true );
+
+        auto p = parse_function_prototype();
+
+        return std::make_unique< ast::extern_item >(
+            utils::location{ start, p->location.end }, std::move( p ) );
+    }
+
+    std::unique_ptr< ast::function_prototype > parser::parse_function_prototype()
+    {
+        const auto start = lexer.current().location.start;
+
+        expect( lexer::token_type::identifier );
+        const auto name = lexer.current().value;
+
+        lexer.next();
+
+        expect( lexer::token_type::sym_lparen, true );
+
+        const auto variable_list = parse_variable_list( true );
+
+        expect( lexer::token_type::sym_rparen, true );
+
+        std::shared_ptr< ast::type::type > type = void_type;
+
+        // Check if there is an annotation for the main prototype
+        if ( lexer.current().type == lexer::token_type::sym_colon )
+        {
+            lexer.next();
+
+            type = parse_type();
+        }
+
+        const auto end = lexer.current().location.end;
+
+        return std::make_unique< ast::function_prototype >(
+            utils::location{ start, end },
+            std::string{ name.cbegin(), name.cend() },
+            std::move( variable_list ),
+            type );
     }
 
     std::vector< lexer::token > parser::parse_identifier_list()
@@ -337,13 +385,18 @@ namespace lorraine::parser
             "any", std::make_shared< ast::type::type >( ast::type::type::primitive_type::any ) );
     }
 
-    std::shared_ptr< ast::variable > parser::parse_variable()
+    std::shared_ptr< ast::variable > parser::parse_variable( bool allow_variadic )
     {
         const auto start = lexer.current().location.start;
 
         std::shared_ptr< ast::type::type > type = any_type;
 
-        expect( lexer::token_type::identifier );
+        bool is_variadic = false;
+        if ( allow_variadic && lexer.current().type == lexer::token_type::cmb_vararg )
+            is_variadic = true;
+        else
+            expect( lexer::token_type::identifier );
+
         const auto& name = lexer.current().value;
 
         lexer.next();
@@ -357,11 +410,14 @@ namespace lorraine::parser
 
         const auto end = lexer.current().location.end;
 
-        return std::make_shared< ast::variable >(
-            utils::location{ start, end }, std::string{ name.begin(), name.end() }, type );
+        if ( !is_variadic )
+            return std::make_shared< ast::variable >(
+                utils::location{ start, end }, std::string{ name.begin(), name.end() }, type );
+        else
+            return std::make_shared< ast::variadic >( utils::location{ start, end }, type );
     }
 
-    ast::variable_list parser::parse_variable_list()
+    ast::variable_list parser::parse_variable_list( bool allow_variadic )
     {
         ast::variable_list variables;
 
@@ -370,7 +426,7 @@ namespace lorraine::parser
             if ( variables.size() )
                 lexer.next();
 
-            variables.push_back( parse_variable() );
+            variables.push_back( parse_variable( allow_variadic ) );
         } while ( lexer.current().type == lexer::token_type::sym_comma );
 
         return variables;
