@@ -11,10 +11,7 @@ namespace lorraine::parser
     {
        public:
         /// @brief Initializes a new parser class instance
-        explicit parser(
-            const std::string& name,
-            const std::string_view& source,
-            compiler::compiler* compiler )
+        explicit parser( const std::string& name, const std::string_view& source, compiler::compiler* compiler )
             : source( source ),
               lexer( source, compiler ),
               compiler( compiler )
@@ -56,9 +53,7 @@ namespace lorraine::parser
         /// @param loc The location of the import statement invoking this function
         /// @param name The module name
         /// @return The new module
-        std::unique_ptr< ast::module > get_module(
-            const utils::location& loc,
-            const std::string_view& name );
+        std::unique_ptr< ast::module > get_module( const utils::location& loc, const std::string_view& name );
 
         /// @brief Parses a block (list of statements)
         /// @return New block
@@ -129,6 +124,24 @@ namespace lorraine::parser
         /// @return New function prototype
         std::unique_ptr< ast::function_prototype > parse_function_prototype();
 
-        std::unique_ptr< ast::expression > parser::parse_function_call();
+        /// @brief Parses a prefix expression. These consist of an expression group or a name expression.
+        /// @return Prefix expression
+        std::unique_ptr< ast::expression > parse_prefix_expression();
+
+        /// @brief Parses an expression group (parenthesis around an expression)
+        /// @return Expression group
+        std::unique_ptr< ast::expression_group > parse_expression_group();
+
+        /// @brief Parses a name expression. This is an identifier that can be a variable or a global.
+        /// @return Name expression
+        std::unique_ptr< ast::expression > parse_name_expression();
+
+        /// @brief Parses a primary expression. Basically anything that can be referenced by a name.
+        /// @return Primary expression
+        std::unique_ptr< ast::expression > parse_primary_expression();
+
+        /// @brief Parses a call expression. This can be a call to a function or class constructor.
+        /// @return Function call expression
+        std::unique_ptr< ast::expression > parse_call_expression( std::unique_ptr< ast::expression > function );
     };
 }  // namespace lorraine::parser

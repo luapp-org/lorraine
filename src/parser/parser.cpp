@@ -27,8 +27,7 @@ namespace lorraine::parser
 
     std::unique_ptr< ast::block > parser::parse_block()
     {
-        std::unique_ptr< ast::block > block =
-            std::make_unique< ast::block >( lexer.current().location );
+        std::unique_ptr< ast::block > block = std::make_unique< ast::block >( lexer.current().location );
 
         // Register primitive types in the new block if no parent is provided.
         if ( last_block == nullptr )
@@ -66,10 +65,15 @@ namespace lorraine::parser
 
             default:
             {
-                std::stringstream msg;
-                msg << "unexpected " << current.to_string() << " when parsing statement";
+                std::unique_ptr< ast::expression > primary = parse_primary_expression();
 
-                throw utils::syntax_error( current.location, msg.str() );
+                // If the primary expression is a function call, we can add it to the statement list
+                if ( auto call = dynamic_cast< ast::call* >( primary.get() ) )
+                    return std::make_unique< ast::expression_statement >( std::move( primary ) );
+
+                // Otherwise, we need to notify the user that this is not a valid statement
+                throw utils::syntax_error(
+                    primary->location, "expected function call; the provided code is not a valid statement" );
             }
         }
 
@@ -115,8 +119,7 @@ namespace lorraine::parser
                     std::shared_ptr< ast::variable > var = std::make_shared< ast::variable >(
                         identifier.location, std::string{ name.begin(), name.end() }, type );
 
-                    imports.push_back(
-                        std::make_unique< ast::variable_reference >( identifier.location, var ) );
+                    imports.push_back( std::make_unique< ast::variable_reference >( identifier.location, var ) );
 
                     last_block->variables.emplace( name, type );
                 }
@@ -131,8 +134,7 @@ namespace lorraine::parser
                 else
                 {
                     std::stringstream msg;
-                    msg << "unable to find export of '" << name << "' in "
-                        << module->info->filename.c_str();
+                    msg << "unable to find export of '" << name << "' in " << module->info->filename.c_str();
 
                     throw utils::syntax_error( identifier.location, msg.str() );
                 }
@@ -146,8 +148,7 @@ namespace lorraine::parser
     {
         if ( last_block->parent != nullptr )
             throw utils::syntax_error(
-                lexer.current().location,
-                "exports are only allowed in the lowest scope level of the module" );
+                lexer.current().location, "exports are only allowed in the lowest scope level of the module" );
 
         const auto& start = lexer.current().location.start;
 
@@ -164,8 +165,7 @@ namespace lorraine::parser
                 last_block->export_types.emplace( type_alias->name, type_alias->type );
 
                 return std::make_unique< ast::export_item >(
-                    utils::location{ start, lexer.current().location.end },
-                    std::move( type_alias ) );
+                    utils::location{ start, lexer.current().location.end }, std::move( type_alias ) );
             }
         }
 
@@ -184,8 +184,79 @@ namespace lorraine::parser
 
         auto p = parse_function_prototype();
 
-        return std::make_unique< ast::extern_item >(
-            utils::location{ start, p->location.end }, std::move( p ) );
+        return std::make_unique< ast::extern_item >( utils::location{ start, p->location.end }, std::move( p ) );
+    }
+
+    std::unique_ptr< ast::expression > parser::parse_primary_expression()
+    {
+        const auto start = lexer.current().location.start;
+
+        std::unique_ptr< ast::expression > expression = parse_prefix_expression();
+
+        while ( true )
+        {
+            const auto& current = lexer.current();
+
+            switch ( current.type )
+            {
+                case lexer::token_type::sym_lparen:
+                case lexer::token_type::string:
+                case lexer::token_type::sym_lbrace:
+                {
+                    expression = parse_call_expression( std::move( expression ) );
+                    continue;
+                }
+            }
+
+            // Once we can't identify any more expressions, break out of the loop
+            break;
+        }
+
+        return expression;
+    }
+
+    std::unique_ptr< ast::expression > parser::parse_call_expression( std::unique_ptr< ast::expression > function )
+    {
+        switch ( lexer.current().type )
+        {
+            case lexer::token_type::sym_lparen:
+            {
+                const auto start = lexer.current().location.start;
+
+                lexer.next();
+
+                ast::expression_list arguments;
+
+                // If the next token is not a right parenthesis, parse the argument list
+                if ( lexer.current().type != lexer::token_type::sym_rparen )
+                {
+                    arguments = parse_expression_list();
+                }
+
+                expect( lexer::token_type::sym_rparen, true );
+
+                const auto end = lexer.current().location.end;
+
+                return std::make_unique< ast::call >(
+                    utils::location{ start, end }, std::move( function ), std::move( arguments ) );
+            }
+            case lexer::token_type::string:
+            {
+                // We know that the expression is going to be a string literal but we still call parse_expression for
+                // convenience.
+                std::unique_ptr< ast::expression > expression = parse_expression();
+
+                ast::expression_list arguments;
+                arguments.push_back( std::move( expression ) );
+
+                return std::make_unique< ast::call >(
+                    expression->location, std::move( function ), std::move( arguments ) );
+            }
+        }
+
+        throw utils::syntax_error( lexer.current().location, "expected '(' or string literal" );
+
+        return nullptr;
     }
 
     std::unique_ptr< ast::function_prototype > parser::parse_function_prototype()
@@ -238,16 +309,13 @@ namespace lorraine::parser
         return identifiers;
     }
 
-    std::unique_ptr< ast::module > parser::get_module(
-        const utils::location& loc,
-        const std::string_view& name )
+    std::unique_ptr< ast::module > parser::get_module( const utils::location& loc, const std::string_view& name )
     {
         std::shared_ptr< ast::module::information > info =
             ast::module::get_information( this->info, std::string{ name.begin(), name.end() } );
 
         if ( !info )
-            throw utils::syntax_error(
-                loc, "There was an issue parsing the module name. Use './' for local files." );
+            throw utils::syntax_error( loc, "There was an issue parsing the module name. Use './' for local files." );
 
         // Check if module actually exists
         auto source = utils::io::read_file( info->absolute() );
@@ -370,19 +438,11 @@ namespace lorraine::parser
         // Note: doing this so that the formatter doesn't multiline
         auto& types = block->types;
 
-        types.emplace(
-            "string",
-            std::make_shared< ast::type::type >( ast::type::type::primitive_type::string ) );
-        types.emplace(
-            "number",
-            std::make_shared< ast::type::type >( ast::type::type::primitive_type::number ) );
-        types.emplace(
-            "boolean",
-            std::make_shared< ast::type::type >( ast::type::type::primitive_type::boolean ) );
-        types.emplace(
-            "void", std::make_shared< ast::type::type >( ast::type::type::primitive_type::void_ ) );
-        types.emplace(
-            "any", std::make_shared< ast::type::type >( ast::type::type::primitive_type::any ) );
+        types.emplace( "string", std::make_shared< ast::type::type >( ast::type::type::primitive_type::string ) );
+        types.emplace( "number", std::make_shared< ast::type::type >( ast::type::type::primitive_type::number ) );
+        types.emplace( "boolean", std::make_shared< ast::type::type >( ast::type::type::primitive_type::boolean ) );
+        types.emplace( "void", std::make_shared< ast::type::type >( ast::type::type::primitive_type::void_ ) );
+        types.emplace( "any", std::make_shared< ast::type::type >( ast::type::type::primitive_type::any ) );
     }
 
     std::shared_ptr< ast::variable > parser::parse_variable( bool allow_variadic )
@@ -469,8 +529,7 @@ namespace lorraine::parser
                     std::stringstream message;
                     message << "Unable to convert '" << data << "' to a number";
 
-                    throw utils::syntax_error(
-                        utils::location{ start, lexer.current().location.end }, message.str() );
+                    throw utils::syntax_error( utils::location{ start, lexer.current().location.end }, message.str() );
                 }
 
                 lexer.next();
@@ -506,14 +565,67 @@ namespace lorraine::parser
             default:
             {
                 std::stringstream stream;
-                stream << "unexpected token '" << current.to_string()
-                       << "' when parsing expression";
+                stream << "unexpected token '" << current.to_string() << "' when parsing expression";
 
                 throw utils::syntax_error( current.location, stream.str() );
             }
         }
 
         return nullptr;
+    }
+
+    std::unique_ptr< ast::expression > parser::parse_prefix_expression()
+    {
+        // If our current token is a left parenthesis then we create a new expression group
+        if ( lexer.current().type == lexer::token_type::sym_lparen )
+            return parse_expression_group();
+
+        return parse_name_expression();
+    }
+
+    std::unique_ptr< ast::expression > parser::parse_name_expression()
+    {
+        expect( lexer::token_type::identifier );
+
+        const auto location = lexer.current().location;
+        const auto name = lexer.current().value;
+
+        lexer.next();
+
+        const auto it = last_block->variables.find( name );
+
+        // If we found a variable with the given name then we create a variable reference
+        if ( it != last_block->variables.end() )
+        {
+            const auto variable =
+                std::make_shared< ast::variable >( location, std::string{ name.begin(), name.end() }, it->second );
+
+            return std::make_unique< ast::variable_reference >( location, variable );
+        }
+        else
+        {
+            std::stringstream stream;
+            stream << "unknown variable '" << name << "'";
+
+            throw utils::syntax_error( location, stream.str() );
+        }
+
+        return nullptr;
+    }
+
+    std::unique_ptr< ast::expression_group > parser::parse_expression_group()
+    {
+        const auto start = lexer.current().location.start;
+
+        expect( lexer::token_type::sym_lparen, true );
+
+        std::unique_ptr< ast::expression > expression = parse_expression();
+
+        const auto end = lexer.current().location.end;
+
+        expect( lexer::token_type::sym_rparen, true );
+
+        return std::make_unique< ast::expression_group >( utils::location{ start, end }, std::move( expression ) );
     }
 
     std::unique_ptr< ast::local_assignment > parser::parse_local_assignment()
@@ -531,9 +643,7 @@ namespace lorraine::parser
         ast::expression_list expressions = parse_expression_list();
 
         return std::make_unique< ast::local_assignment >(
-            utils::location{ start, lexer.current().location.end },
-            variables,
-            std::move( expressions ) );
+            utils::location{ start, lexer.current().location.end }, variables, std::move( expressions ) );
     }
 
     void parser::expect( const lexer::token_type type, const bool consume )
@@ -543,8 +653,8 @@ namespace lorraine::parser
         if ( current_token.type != type )
         {
             std::stringstream message;
-            message << "expected '" << lexer::token::to_string( type ) << "', got '"
-                    << lexer.current().to_string() << "'";
+            message << "expected '" << lexer::token::to_string( type ) << "', got '" << lexer.current().to_string()
+                    << "'";
 
             throw utils::syntax_error( current_token.location, message.str() );
         }

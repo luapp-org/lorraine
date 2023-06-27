@@ -45,6 +45,11 @@ namespace lorraine::ast
         v->visit( this );
     }
 
+    void boolean_literal::visit( visitor* v )
+    {
+        v->visit( this );
+    }
+
     void function_prototype::visit( visitor* v )
     {
         v->visit( this );
@@ -56,7 +61,7 @@ namespace lorraine::ast
             variable->visit( v );
     }
 
-    void expression_index::visit( visitor* v ) 
+    void expression_index::visit( visitor* v )
     {
         if ( v->visit( this ) )
         {
