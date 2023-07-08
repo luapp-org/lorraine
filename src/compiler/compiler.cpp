@@ -11,10 +11,7 @@
 
 namespace lorraine::compiler
 {
-    std::stringstream compiler::compile(
-        const std::string& name,
-        const std::string_view& source,
-        compiler_stage stage )
+    std::stringstream compiler::compile( const std::string& name, const std::string_view& source, compiler_stage stage )
     {
         this->source = source;
 
@@ -31,10 +28,12 @@ namespace lorraine::compiler
 
         if ( main_module )
         {
-            ast::type::validator::validate( main_module.get(), this );
+            if ( !ast::type::validator::validate( main_module.get(), this ) )
+                return {};
 
             code_generation::code_generation gen{ main_module.get() };
             std::shared_ptr< llvm::Module > main = gen.generate();
+
             main->print( llvm::errs(), nullptr );
         }
 
@@ -46,8 +45,7 @@ namespace lorraine::compiler
         const std::string_view& source,
         const utils::syntax_error& error )
     {
-        llvm::errs() << name << ':' << error.location.start.line << ':'
-                     << error.location.start.column + 1 << ": ";
+        llvm::errs() << name << ':' << error.location.start.line << ':' << error.location.start.column + 1 << ": ";
         llvm::WithColor::error();
 
         std::cerr << error.msg;

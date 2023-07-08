@@ -12,13 +12,13 @@ namespace lorraine::code_generation
         ast_module->body->visit( &collector );
 
         // Compile external function declerations
-        for ( const auto func : collector.external_functions )
-            compile_function_prototype( func );
+        for ( const auto func : collector.external_declerations )
+            compile_external_decleration( func );
 
         const auto type = llvm::FunctionType::get( llvm::Type::getVoidTy( context ), false );
 
-        const auto entry_function = llvm::Function::Create(
-            type, llvm::GlobalValue::InternalLinkage, "entry", *llvm_module );
+        const auto entry_function =
+            llvm::Function::Create( type, llvm::GlobalValue::InternalLinkage, "entry", *llvm_module );
 
         const auto entry_block = llvm::BasicBlock::Create( context, "entry", entry_function );
 
@@ -33,42 +33,30 @@ namespace lorraine::code_generation
         return llvm_module;
     }
 
-    llvm::Function* code_generation::compile_function_prototype(
-        ast::function_prototype* function,
-        bool is_extern )
+    llvm::Function* code_generation::get_or_create_function( std::shared_ptr< ast::variable > variable, bool external )
     {
-        llvm::Function* func = llvm_module->getFunction( function->name );
-
-        if ( !func )
+        if ( const auto function_type =
+                 llvm::dyn_cast< llvm::FunctionType >( variable->type->to_llvm_type( context ) ) )
         {
-            llvm::FunctionType* function_type = get_llvm_function_type( function );
-            func = llvm::Function::Create(
-                function_type, llvm::GlobalValue::ExternalLinkage, function->name, *llvm_module );
-        }
+            llvm::Function* func = llvm_module->getFunction( variable->value );
 
-        return func;
+            if ( !func )
+            {
+                func = llvm::Function::Create(
+                    function_type,
+                    external ? llvm::GlobalValue::ExternalLinkage : llvm::GlobalValue::InternalLinkage,
+                    variable->value,
+                    *llvm_module );
+            }
+
+            return func;
+        }
+        else
+            throw utils::compiler_error( "Invalid function type" );
     }
 
-    llvm::FunctionType* code_generation::get_llvm_function_type( ast::function_prototype* function )
+    llvm::Function* code_generation::compile_external_decleration( std::shared_ptr< ast::variable > variable )
     {
-        const auto return_type = function->type->to_llvm_type( context );
-
-        if ( !llvm::FunctionType::isValidReturnType( return_type ) )
-            throw utils::compiler_error( "invalid return type" );
-
-        std::vector< llvm::Type* > argument_types;
-
-        for ( const auto arg : function->args )
-        {
-            const auto arg_type = arg->type->to_llvm_type( context );
-
-            if ( !llvm::FunctionType::isValidArgumentType( arg_type ) )
-                throw utils::compiler_error( "invalid argument type" );
-
-            argument_types.push_back( arg_type );
-        }
-
-        return llvm::FunctionType::get(
-            return_type, llvm::makeArrayRef( argument_types ), function->vararg );
+        return get_or_create_function( variable, true );
     }
 }  // namespace lorraine::code_generation

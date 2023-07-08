@@ -33,7 +33,7 @@ namespace lorraine::ast
         return it->second;
     }
 
-    std::shared_ptr< type::type > block::get_export_type( const std::string_view& name )
+    std::shared_ptr< type::type > block::get_export_type( const std::string& name )
     {
         const auto it = export_types.find( name );
 
@@ -95,7 +95,7 @@ namespace lorraine::ast
         return it->second;
     }
 
-    std::shared_ptr< type::type > block::get_export_variable_type( const std::string_view& name )
+    std::shared_ptr< type::type > block::get_export_variable_type( const std::string& name )
     {
         const auto it = export_variables.find( name );
 
@@ -111,9 +111,7 @@ namespace lorraine::ast
             expr->visit( v );
     }
 
-    std::shared_ptr< module::information > module::information::get(
-        const std::string& path,
-        std::string_view source )
+    std::shared_ptr< module::information > module::information::get( const std::string& path, std::string_view source )
     {
         std::shared_ptr< module::information > info = std::make_shared< module::information >();
         info->source = source;
@@ -163,10 +161,9 @@ namespace lorraine::ast
         return info;
     }
 
-    void extern_item::visit( visitor* v )
+    void external_decleration::visit( visitor* v )
     {
-        if ( v->visit( this ) )
-            function->visit( v );
+        v->visit( this );
     }
 
 }  // namespace lorraine::ast

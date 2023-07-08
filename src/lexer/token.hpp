@@ -80,7 +80,7 @@ namespace lorraine::lexer
         cmb_compmoe,  // %=
         cmb_comppoe,  // ^=
         cmb_compce,   // ..=
-        cmb_arrow,    // ->
+        cmb_arrow,    // =>
 
         // Literals
         string,
@@ -176,7 +176,7 @@ namespace lorraine::lexer
                 case token_type::cmb_compmoe: return "%=";
                 case token_type::cmb_comppoe: return "^=";
                 case token_type::cmb_compce: return "..=";
-                case token_type::cmb_arrow: return "->";
+                case token_type::cmb_arrow: return "=>";
 
                 default: return "<unknown>";
             }

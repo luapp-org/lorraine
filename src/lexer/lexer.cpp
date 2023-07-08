@@ -29,8 +29,7 @@ namespace lorraine::lexer
                 {
                     if ( !read_long_string( start ) )
                         throw utils::syntax_error(
-                            utils::location{ start, current_position() },
-                            "unfinished long string near <eof>" );
+                            utils::location{ start, current_position() }, "unfinished long string near <eof>" );
                 }
                 else
                 {
@@ -46,6 +45,13 @@ namespace lorraine::lexer
                 {
                     consume_character();
                     t.type = token_type::cmb_eq;
+                    t.location = { start, current_position() };
+                    break;
+                }
+                else if ( peek_character() == '>' )
+                {
+                    consume_character();
+                    t.type = token_type::cmb_arrow;
                     t.location = { start, current_position() };
                     break;
                 }
@@ -176,13 +182,6 @@ namespace lorraine::lexer
                     t.location = { start, current_position() };
                     break;
                 }
-                else if ( peek_character() == '>' )
-                {
-                    consume_character();
-                    t.type = token_type::cmb_arrow;
-                    t.location = { start, current_position() };
-                    break;
-                }
 
                 t.type = token_type::sym_min;
                 t.location = { start, start };
@@ -257,8 +256,7 @@ namespace lorraine::lexer
                     std::stringstream msg;
                     msg << "unrecognized character '" << c << "'";
 
-                    throw utils::syntax_error(
-                        utils::location{ start, current_position() }, msg.str());
+                    throw utils::syntax_error( utils::location{ start, current_position() }, msg.str() );
 
                     consume_character();
                     return;
@@ -272,7 +270,7 @@ namespace lorraine::lexer
         const std::size_t start_offset = offset;
 
         // Consume all characters that qualify
-        while ( std::iswalnum( peek_character() ) || peek_character() == '_' )
+        while ( std::isalnum( peek_character() ) || peek_character() == '_' )
             consume_character();
 
         t.location = { start, current_position() };
@@ -327,7 +325,7 @@ namespace lorraine::lexer
     {
         bool comment;
 
-        while ( ( comment = is_comment() ) || std::iswspace( peek_character() ) )
+        while ( ( comment = is_comment() ) || std::isspace( peek_character() ) )
         {
             if ( !comment )
                 consume_character();
@@ -349,11 +347,10 @@ namespace lorraine::lexer
 
             if ( !read_long_string( start ) )
                 throw utils::syntax_error(
-                    utils::location{ start, current_position() },
-                    "unfinished long comment near <eof>" );
+                    utils::location{ start, current_position() }, "unfinished long comment near <eof>" );
         }
 
-        while ( peek_character() == '\n' || peek_character() == '\r' && peek_character() != WEOF )
+        while ( ( peek_character() != '\n' || peek_character() != '\r' ) && peek_character() != WEOF )
             consume_character();
     }
 
@@ -371,8 +368,7 @@ namespace lorraine::lexer
                 case '\r':
                 {
                     throw utils::syntax_error(
-                        utils::location{ start, current_position() },
-                        "unfinished string, expected closing quote" );
+                        utils::location{ start, current_position() }, "unfinished string, expected closing quote" );
                     return;
                 }
             }
@@ -401,7 +397,7 @@ namespace lorraine::lexer
         }
 
         // Added for hexadecimal support, simplifies work in the parser
-        while ( std::isdigit( peek_character() ) || std::iswalpha( peek_character() ) )
+        while ( std::isdigit( peek_character() ) || std::isalpha( peek_character() ) )
             consume_character();
 
         t.location = { start, current_position() };
@@ -428,8 +424,7 @@ namespace lorraine::lexer
                     consume_character();
 
                     t.type = token_type::string;
-                    t.value = source.substr(
-                        start_offset, ( ( offset - start_offset ) - delim_count ) - 2 );
+                    t.value = source.substr( start_offset, ( ( offset - start_offset ) - delim_count ) - 2 );
                     t.location = { start, current_position() };
                     return true;
                 }
@@ -462,10 +457,9 @@ namespace lorraine::lexer
         {
             token = current();
 
-            out << std::left << std::setw( 15 ) << token.to_string() << std::right
-                << std::setw( 12 ) << token.location.start.line << ':'
-                << token.location.start.column << "-" << token.location.end.line << ':'
-                << token.location.end.column << '\n';
+            out << std::left << std::setw( 15 ) << token.to_string() << std::right << std::setw( 12 )
+                << token.location.start.line << ':' << token.location.start.column << "-" << token.location.end.line
+                << ':' << token.location.end.column << '\n';
 
             next();
         } while ( token.type != token_type::eof );

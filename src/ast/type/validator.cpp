@@ -32,7 +32,6 @@ namespace lorraine::ast::type
         if ( node->values.size() > node->variables.size() )
         {
             throw utils::syntax_error( location, "Too many values in local assignment" );
-
             return false;
         }
 
@@ -41,7 +40,6 @@ namespace lorraine::ast::type
             if ( !compiler->cfg.get< bool >( "imbalancedLocalAssignments" ) )
             {
                 throw utils::syntax_error( location, "Too few values in local assignment" );
-
                 return false;
             }
             else
@@ -64,9 +62,8 @@ namespace lorraine::ast::type
             {
                 std::stringstream stream;
 
-                stream << "type mismatch; unable to assign variable of type '"
-                       << variable->type->to_string() << "' a value of type '"
-                       << value->type->to_string() << "'";
+                stream << "type mismatch; unable to assign variable of type '" << variable->type->to_string()
+                       << "' a value of type '" << value->type->to_string() << "'";
 
                 throw utils::syntax_error( variable->location, stream.str() );
 
@@ -77,25 +74,8 @@ namespace lorraine::ast::type
         return true;
     }
 
-    bool validator::visit( function_prototype* node )
+    bool validator::visit( external_decleration *node )
     {
-        for ( std::size_t i = 0; i < node->args.size(); ++i )
-        {
-            const auto arg = node->args[ i ];
-
-            if ( auto v = dynamic_cast< variadic* >( arg.get() ) )
-            {
-                if ( i + 1 != node->args.size() )
-                    throw utils::syntax_error(
-                        arg->location, "variadic argument can only be last in the argument list" );
-                else
-                {
-                    node->vararg = v;
-                    node->args.pop_back();
-                }
-            }
-        }
-
         return true;
     }
 }  // namespace lorraine::ast::type

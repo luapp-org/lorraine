@@ -41,8 +41,7 @@ namespace lorraine::cli
             }
             catch ( const std::out_of_range& e )
             {
-                throw std::runtime_error(
-                    "Error retrieving value from option '" + std::string{ name } + "'" );
+                throw std::runtime_error( "Error retrieving value from option '" + std::string{ name } + "'" );
             }
         }
 
@@ -53,9 +52,10 @@ namespace lorraine::cli
             { "locale", option_value{ "" } },
             { "elapsedTime", option_value{ true } },
             { "detailedErrors", option_value{ true } },
-            
+
             // Compiler flags (affect behavior of language)
             { "imbalancedLocalAssignments", option_value{ true } },
+            { "allowTypelessFunctions", option_value{ false } }
         };
     };
 }  // namespace lorraine::cli

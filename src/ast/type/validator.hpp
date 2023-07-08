@@ -15,7 +15,7 @@ namespace lorraine::ast::type
         static bool validate( module *root, compiler::compiler *compiler );
 
         bool visit( local_assignment *node ) override;
-        bool visit( function_prototype *node ) override;
+        bool visit( external_decleration *node ) override;
 
        private:
        compiler::compiler *compiler;

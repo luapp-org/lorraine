@@ -45,6 +45,6 @@ namespace lorraine::ast
         visitor_definition( statement, export_item );
         visitor_definition( statement, module );
         visitor_definition( statement, import );
-        visitor_definition( statement, extern_item );
+        visitor_definition( statement, external_decleration );
     };
 }  // namespace lorraine::ast

@@ -1,3 +1,3 @@
-extern printf(format: string, ...: any): number
+extern printf: (string, ...any) => number
 
 printf("Hello, %s!", "world")

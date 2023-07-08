@@ -55,6 +55,16 @@ namespace lorraine::parser
         /// @return The new module
         std::unique_ptr< ast::module > get_module( const utils::location& loc, const std::string_view& name );
 
+        /// @brief Creates a type list from the types referenced in an expression list
+        /// @param expressions The expression list
+        /// @return The type list
+        ast::type::type_list get_type_list( ast::expression_list expressions );
+
+        /// @brief Creates a type list from the types referenced in a variable list
+        /// @param variables The variable list
+        /// @return The type list
+        ast::type::type_list get_type_list( ast::variable_list variables );
+
         /// @brief Parses a block (list of statements)
         /// @return New block
         std::unique_ptr< ast::block > parse_block();
@@ -84,6 +94,15 @@ namespace lorraine::parser
         /// @return Type structure
         std::shared_ptr< ast::type::type > parse_type();
 
+        /// @brief Parses a type reference in the source code. It does exactly what `parse_type` does but does not throw
+        /// an exception if the current token does not match any of the tokens.
+        /// @return Type structure
+        std::shared_ptr< ast::type::type > unsafe_parse_type();
+
+        /// @brief Parses a type list reference.
+        /// @return Type list
+        ast::type::type_list parse_type_list();
+
         /// @brief Parses a named type, types that are referenced by names (primitives & classes)
         /// @return Type structure
         std::shared_ptr< ast::type::type > parse_named_type();
@@ -91,6 +110,14 @@ namespace lorraine::parser
         /// @brief Parses a table type reference.
         /// @return Table descriptor
         std::shared_ptr< ast::type::type > parse_table_type();
+
+        /// @brief Parses a function type reference.
+        /// @return Function type
+        std::shared_ptr< ast::type::type > parse_function_type();
+
+        /// @brief Parses a vararg type reference.
+        /// @return Vararg type
+        std::shared_ptr< ast::type::type > parse_vararg_type();
 
         /// @brief Parses a local assignment in the source code.
         /// @return Local assignment
@@ -118,7 +145,7 @@ namespace lorraine::parser
 
         /// @brief Parses an extern statement (imports c functions)
         /// @return New extern statement
-        std::unique_ptr< ast::extern_item > parse_extern();
+        std::unique_ptr< ast::external_decleration > parse_extern();
 
         /// @brief Parses function prototype
         /// @return New function prototype

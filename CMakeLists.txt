@@ -29,6 +29,8 @@ add_executable(compiler
             src/ast/statement.cpp
             src/ast/type/type.cpp
             src/ast/type/table_descriptor.cpp
+            src/ast/type/function_descriptor.cpp
+            src/ast/type/vararg_descriptor.cpp
             src/ast/type/validator.cpp
             src/parser/parser.cpp
 

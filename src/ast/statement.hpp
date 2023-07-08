@@ -44,8 +44,8 @@ namespace lorraine::ast
         std::unordered_map< std::string_view, std::shared_ptr< type::type > > types;
 
         // Exportable data types
-        std::unordered_map< std::string_view, std::shared_ptr< type::type > > export_variables;
-        std::unordered_map< std::string_view, std::shared_ptr< type::type > > export_types;
+        std::unordered_map< std::string, std::shared_ptr< type::type > > export_variables;
+        std::unordered_map< std::string, std::shared_ptr< type::type > > export_types;
 
         explicit block( const utils::location& location, statement_list body )
             : statement( location ),
@@ -60,8 +60,8 @@ namespace lorraine::ast
         std::shared_ptr< type::type > get_type( const std::string_view& name );
         std::shared_ptr< type::type > get_variable_type( const std::string_view& name );
 
-        std::shared_ptr< type::type > get_export_type( const std::string_view& name );
-        std::shared_ptr< type::type > get_export_variable_type( const std::string_view& name );
+        std::shared_ptr< type::type > get_export_type( const std::string& name );
+        std::shared_ptr< type::type > get_export_variable_type( const std::string& name );
 
         void load_variable_list( variable_list variables );
 
@@ -148,13 +148,13 @@ namespace lorraine::ast
         void visit( visitor* v ) override;
     };
 
-    struct extern_item : statement
+    struct external_decleration : statement
     {
-        std::unique_ptr< ast::function_prototype > function;
+        std::shared_ptr< variable > var;
 
-        explicit extern_item( const utils::location& location, std::unique_ptr< ast::function_prototype > function )
+        explicit external_decleration( const utils::location& location, std::shared_ptr< variable > var )
             : statement( location ),
-              function( std::move( function ) )
+              var( var )
         {
         }
 

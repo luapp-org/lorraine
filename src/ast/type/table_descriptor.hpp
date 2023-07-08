@@ -17,14 +17,14 @@ namespace lorraine::ast::type
         // local variable where the type proceeds a ':'.
         struct table_property
         {
-            std::string_view name;
+            std::string name;
             std::shared_ptr< type > t;
 
             // Optional properties can be specified with a '?' after the property name.
             bool is_optional;
 
             explicit table_property(
-                const std::string_view& name,
+                const std::string& name,
                 std::shared_ptr< type > t,
                 bool is_optional )
                 : name( name ),

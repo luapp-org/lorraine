@@ -15,7 +15,13 @@ namespace lorraine::ast::type
     // argument in the function.
     struct function_descriptor
     {
-        type_list arguments;
-        std::shared_ptr< type > return_type;
+        type_list arguments, returns;
+
+        // Creates the function descriptor with a type list and return type
+        explicit function_descriptor( type_list arguments, type_list returns );
+
+        /// @brief Converts the current descriptor to a string representation of its values.
+        /// @return String representation
+        std::string to_string() const;
     };
 }  // namespace lorraine::ast::type

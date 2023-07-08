@@ -31,6 +31,7 @@ namespace lorraine::ast
             : expression( location ),
               value( value )
         {
+            type = std::make_shared< type::type >( type::type::primitive_type::number );
         }
 
         void visit( visitor* v ) override;
@@ -44,6 +45,7 @@ namespace lorraine::ast
             : expression( location ),
               value( value )
         {
+            type = std::make_shared< type::type >( type::type::primitive_type::string );
         }
 
         void visit( visitor* v ) override;
@@ -55,6 +57,7 @@ namespace lorraine::ast
 
         explicit boolean_literal( const utils::location& location, bool value ) : expression( location ), value( value )
         {
+            type = std::make_shared< type::type >( type::type::primitive_type::boolean );
         }
 
         void visit( visitor* v ) override;
@@ -64,6 +67,7 @@ namespace lorraine::ast
     {
         explicit nil_literal( const utils::location& location ) : expression( location )
         {
+            type = std::make_shared< type::type >( type::type::primitive_type::nil );
         }
 
         void visit( visitor* v ) override;

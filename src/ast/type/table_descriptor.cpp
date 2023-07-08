@@ -14,10 +14,10 @@ namespace lorraine::ast::type
     std::string table_descriptor::to_string() const
     {
         std::stringstream stream;
-        stream << '{' << '\n';
+        stream << "{ ";
 
         for ( const auto& property : properties )
-            stream << "   " << property.name << ": " << property.t->to_string() << ",\n";
+            stream << property.name << ": " << property.t->to_string() << ", ";
 
         stream << '}';
 
