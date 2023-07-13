@@ -64,41 +64,42 @@ namespace lorraine::ast::type
         // Must be an array constructor
         else
         {
-            const auto primary_type = get_primary_type( std::move( node->expressions ) );
+            assert( last_type );
 
-            node->type = std::make_shared< type >( array_descriptor{ primary_type } );
-        }
+            if ( const auto array = std::get_if< array_descriptor >( &last_type->value ) )
+            {
+                for ( const auto& expr : node->expressions )
+                {
+                    if ( !expr->type->is( array->t ) )
+                    {
+                        std::stringstream stream;
 
-        return false;
-    }
+                        stream << "type '" << expr->type->to_string() << "' is not assignable to type '"
+                               << array->t->to_string() << "'";
 
-    std::shared_ptr< type > validator::get_primary_type( expression_list expressions )
-    {
-        // If we have no expressions, we can't determine a type
-        if ( expressions.empty() )
-            return std::make_shared< type >( type::type::primitive_type::unknown );
-
-        std::shared_ptr< type > rtype = nullptr;
-        for ( const auto& expr : expressions )
-        {
-            if ( !rtype )
-                rtype = expr->type;
+                        throw utils::syntax_error( expr->location, stream.str() );
+                        return false;
+                    }
+                }
+            }
             else
             {
-                if ( !rtype->is( expr->type ) )
-                    return std::make_shared< type >( type::type::primitive_type::any );
+                std::stringstream stream;
+
+                stream << "cannot use array constructor on non-array type '" << last_type->to_string() << "'";
+
+                throw utils::syntax_error( node->location, stream.str() );
+                return false;
             }
+
+            node->type = last_type;
         }
 
-        return rtype;
+        return true;
     }
 
     bool validator::visit( local_assignment* node )
     {
-        // Visit all of the expressions
-        for ( auto& expression : node->values )
-            expression->visit( this );
-
         const auto location = utils::location{
             node->values.front()->location.start,
             node->values.back()->location.end,
@@ -133,15 +134,21 @@ namespace lorraine::ast::type
             if ( variable->type->is( type::primitive_type::any ) )
                 continue;
 
+            // Set the last_type to the type of the last variable so that we can compare in the next visitor call
+            last_type = variable->type;
+
+            // Visit the expression (will throw if exception occurs)
+            value->visit( this );
+
+            // Now compare the new types. If they are not the same, throw an exception
             if ( !variable->type->is( value->type ) )
             {
                 std::stringstream stream;
 
-                stream << "type mismatch; unable to assign variable of type '" << variable->type->to_string()
-                       << "' a value of type '" << value->type->to_string() << "'";
+                stream << "unable to assign variable of type '" << variable->type->to_string() << "' a value of type '"
+                       << value->type->to_string() << "'";
 
                 throw utils::syntax_error( variable->location, stream.str() );
-
                 return false;
             }
         }

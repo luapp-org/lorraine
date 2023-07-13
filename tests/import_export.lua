@@ -5,4 +5,4 @@ local a: MyType = {
     s = "hello"
 }
 
-local array: number[] = { 1, "adada", 3 }
+local array: number[] = { 1, "adad", 3 }

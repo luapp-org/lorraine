@@ -19,8 +19,9 @@ namespace lorraine::ast::type
         bool visit( list_constructor *node ) override;
 
        private:
-       compiler::compiler *compiler;
+        compiler::compiler *compiler;
+        std::shared_ptr< type > last_type;
 
-       std::shared_ptr< type > get_primary_type( expression_list expressions );
+        std::shared_ptr< type > get_primary_type( expression_list expressions );
     };
 }  // namespace lorraine::ast::type
