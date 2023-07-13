@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 
 #include "../utils/location.hpp"
 
@@ -96,7 +95,7 @@ namespace lorraine::lexer
     struct token
     {
         token_type type = token_type::eof;
-        std::string_view value{};  
+        std::string value{};  
         utils::location location{};
 
         /// @brief Returns a string representation of the token type provided
@@ -193,15 +192,15 @@ namespace lorraine::lexer
                 case token_type::number:
                 case token_type::boolean:
                 {
-                    return std::string{ value.cbegin(), value.cend() };
+                    return value;
                 }
                 case token_type::string:
                 {
-                    return "\"" + std::string{ value.cbegin(), value.cend() } + "\"";
+                    return "\"" + value + "\"";
                 }
                 case token_type::identifier:
                 {
-                    return "'" + std::string{ value.cbegin(), value.cend() } + "'";
+                    return "'" + value + "'";
                 }
             }
 

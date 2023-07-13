@@ -375,11 +375,12 @@ namespace lorraine::lexer
         while ( ( peek_character() != '\n' || peek_character() != '\r' ) && peek_character() != WEOF )
             consume_character();
     }
-
     void lexer::read_string( const utils::position& start )
     {
         const char quote = get_character();
         const auto start_offset = offset;
+
+        std::string value;
 
         while ( peek_character() != quote )
         {
@@ -393,12 +394,34 @@ namespace lorraine::lexer
                         utils::location{ start, current_position() }, "unfinished string, expected closing quote" );
                     return;
                 }
+                case '\\':
+                {
+                    consume_character();
+
+                    switch ( peek_character() )
+                    {
+                        case '\\': value.push_back( '\\' ); break;
+                        case 'a': value.push_back( '\a' ); break;
+                        case 'b': value.push_back( '\b' ); break;
+                        case 'f': value.push_back( '\f' ); break;
+                        case 'n': value.push_back( '\n' ); break;
+                        case 'r': value.push_back( '\r' ); break;
+                        case 't': value.push_back( '\t' ); break;
+                        case 'v': value.push_back( '\v' ); break;
+                        case '"': value.push_back( '"' ); break;
+                        case '\'': value.push_back( '\'' ); break;
+                    }
+
+                    break;  // Added break statement
+                }
+                default: value.push_back( peek_character() ); break;  // Added break statement
             }
+
             consume_character();
         }
 
         t.type = token_type::string;
-        t.value = source.substr( start_offset, offset - start_offset );
+        t.value = value;
         t.location = { start, current_position() };
     }
 

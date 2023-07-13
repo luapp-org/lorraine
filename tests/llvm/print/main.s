@@ -1,6 +1,11 @@
 	.text
 	.file	"main.lua"
-	.globl	main                            # -- Begin function main
+	.section	.rodata.cst8,"aM",@progbits,8
+	.p2align	3                               # -- Begin function main
+.LCPI0_0:
+	.quad	0x4028000000000000              # double 12
+	.text
+	.globl	main
 	.p2align	4, 0x90
 	.type	main,@function
 main:                                   # @main
@@ -8,9 +13,10 @@ main:                                   # @main
 # %bb.0:                                # %entry
 	pushq	%rax
 	.cfi_def_cfa_offset 16
+	movsd	.LCPI0_0(%rip), %xmm0           # xmm0 = mem[0],zero
 	movl	$.L__unnamed_1, %edi
 	movl	$.L__unnamed_2, %esi
-	xorl	%eax, %eax
+	movb	$1, %al
 	callq	printf@PLT
 	popq	%rax
 	.cfi_def_cfa_offset 8
@@ -22,8 +28,8 @@ main:                                   # @main
 	.type	.L__unnamed_1,@object           # @0
 	.section	.rodata.str1.1,"aMS",@progbits,1
 .L__unnamed_1:
-	.asciz	"Hello, %s!\\n"
-	.size	.L__unnamed_1, 13
+	.asciz	"Hello, %s! %f\n"
+	.size	.L__unnamed_1, 15
 
 	.type	.L__unnamed_2,@object           # @1
 .L__unnamed_2:
