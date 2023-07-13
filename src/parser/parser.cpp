@@ -292,7 +292,7 @@ namespace lorraine::parser
             returns.push_back( void_type );
 
         // Create our type descriptor and add it to the current scope
-        auto descriptor = std::make_shared< ast::type::type >( ast::type::function_descriptor{ arguments, returns } );
+        auto descriptor = std::make_shared< ast::type::type >( ast::type::descriptor::function{ arguments, returns } );
         last_block->variables.emplace( name, descriptor );
 
         const auto end = lexer.current().location.end;
@@ -438,7 +438,7 @@ namespace lorraine::parser
         if ( const auto var_type = unsafe_parse_type() )
             type = var_type;
 
-        return std::make_shared< ast::type::type >( ast::type::vararg_descriptor{ type } );
+        return std::make_shared< ast::type::type >( ast::type::descriptor::vararg{ type } );
     }
 
     ast::type::type_list parser::parse_type_list()
@@ -486,14 +486,14 @@ namespace lorraine::parser
             returns = parse_type_list();
         }
 
-        return std::make_shared< ast::type::type >( ast::type::function_descriptor{ arguments, returns } );
+        return std::make_shared< ast::type::type >( ast::type::descriptor::function{ arguments, returns } );
     }
 
     std::shared_ptr< ast::type::type > parser::parse_table_type()
     {
         expect( lexer::token_type::sym_lbrace, true );
 
-        ast::type::table_descriptor descriptor;
+        ast::type::descriptor::table descriptor;
 
         while ( lexer.current().type != lexer::token_type::sym_rbrace )
         {
@@ -609,7 +609,7 @@ namespace lorraine::parser
 
             expect( lexer::token_type::sym_rbracket, true );
 
-            return std::make_shared< ast::type::type >( ast::type::array_descriptor{ type } );
+            return std::make_shared< ast::type::type >( ast::type::descriptor::array{ type } );
         }
 
         return type;

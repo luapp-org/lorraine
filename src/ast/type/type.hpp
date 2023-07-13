@@ -4,17 +4,16 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Type.h>
 
-
 #include <string>
 #include <string_view>
 #include <variant>
 #include <vector>
 
 #include "../node.hpp"
-#include "array_descriptor.hpp"
-#include "function_descriptor.hpp"
-#include "table_descriptor.hpp"
-#include "vararg_descriptor.hpp"
+#include "descriptor/array.hpp"
+#include "descriptor/function.hpp"
+#include "descriptor/table.hpp"
+#include "descriptor/vararg.hpp"
 
 namespace lorraine::ast::type
 {
@@ -47,22 +46,22 @@ namespace lorraine::ast::type
         /// @brief Compares the current type with a given table descriptor
         /// @param t Table descriptor
         /// @return True if equal
-        bool is( table_descriptor t );
+        bool is( descriptor::table t );
 
         /// @brief Compares the current type with a given function descriptor
         /// @param t Function descriptor
         /// @return True if equal
-        bool is( function_descriptor t );
+        bool is( descriptor::function t );
 
         /// @brief Compares the current type with a given vararg descriptor
         /// @param t Vararg descriptor
         /// @return True if equal
-        bool is( vararg_descriptor t );
+        bool is( descriptor::vararg t );
 
         /// @brief Compares the current type with a given array descriptor
         /// @param t Vararg descriptor
         /// @return True if equal
-        bool is( array_descriptor t );
+        bool is( descriptor::array t );
 
         /// @brief Compares the current type with another type
         /// @param t Other type
@@ -86,7 +85,7 @@ namespace lorraine::ast::type
         /// @brief Converts the current type to a llvm type pointer
         /// @param context LLVM context
         /// @return LLVM type ptr
-        llvm::Type *to_llvm_type( llvm::LLVMContext &context);
+        llvm::Type *to_llvm_type( llvm::LLVMContext &context );
 
         /// @brief Validates the current type. Basically makes sure everything has been legally assigned.
         /// @return True if valid
@@ -96,26 +95,26 @@ namespace lorraine::ast::type
         // @return True if valid
         static bool validate( type_list types, utils::location location );
 
-        std::variant< primitive_type, table_descriptor, function_descriptor, vararg_descriptor, array_descriptor >
+        std::variant< primitive_type, descriptor::table, descriptor::function, descriptor::vararg, descriptor::array >
             value;
 
         type( primitive_type t ) : value( t )
         {
         }
 
-        type( array_descriptor t ) : value( t )
+        type( descriptor::array t ) : value( t )
         {
         }
 
-        type( table_descriptor t ) : value( t )
+        type( descriptor::table t ) : value( t )
         {
         }
 
-        type( function_descriptor t ) : value( t )
+        type( descriptor::function t ) : value( t )
         {
         }
 
-        type( vararg_descriptor t ) : value( t )
+        type( descriptor::vararg t ) : value( t )
         {
         }
 

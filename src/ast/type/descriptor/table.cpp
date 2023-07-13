@@ -1,17 +1,17 @@
-#include "table_descriptor.hpp"
+#include "table.hpp"
 
 #include <sstream>
 
-#include "type.hpp"
+#include "../type.hpp"
 
-namespace lorraine::ast::type
+namespace lorraine::ast::type::descriptor
 {
-    bool table_descriptor::table_property::is( table_descriptor::table_property property )
+    bool table::table_property::is( table::table_property property )
     {
         return property.name == name && property.t->is( t );
     }
 
-    std::string table_descriptor::to_string() const
+    std::string table::to_string() const
     {
         std::stringstream stream;
         stream << "{ ";
@@ -23,4 +23,4 @@ namespace lorraine::ast::type
 
         return stream.str();
     }
-}  // namespace lorraine::ast::type
+}  // namespace lorraine::ast::type::descriptor

@@ -50,13 +50,13 @@ namespace lorraine::ast::type
         // Must be a table constructor
         if ( table_constructor )
         {
-            table_descriptor table;
+            descriptor::table table;
 
             for ( const auto& expr : node->expressions )
             {
                 if ( const auto assignment = dynamic_cast< variable_assignment* >( expr.get() ) )
                     table.properties.push_back(
-                        table_descriptor::table_property{ assignment->var->value, assignment->value->type, false } );
+                        descriptor::table::table_property{ assignment->var->value, assignment->value->type, false } );
             }
 
             node->type = std::make_shared< type >( table );
@@ -66,7 +66,7 @@ namespace lorraine::ast::type
         {
             assert( last_type );
 
-            if ( const auto array = std::get_if< array_descriptor >( &last_type->value ) )
+            if ( const auto array = std::get_if< descriptor::array >( &last_type->value ) )
             {
                 for ( const auto& expr : node->expressions )
                 {

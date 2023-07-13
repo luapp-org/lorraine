@@ -49,7 +49,7 @@ namespace lorraine::code_generation
 
     bool llvm_visitor::visit( ast::variable_reference* node )
     {
-        if ( const auto function = std::get_if< ast::type::function_descriptor >( &node->var->type->value ) )
+        if ( const auto function = std::get_if< ast::type::descriptor::function >( &node->var->type->value ) )
         {
             value = gen.get_or_create_function( node->var );
         }

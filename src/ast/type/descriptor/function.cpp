@@ -1,12 +1,12 @@
-#include "function_descriptor.hpp"
+#include "function.hpp"
 
 #include <sstream>
 
-#include "type.hpp"
+#include "../type.hpp"
 
-namespace lorraine::ast::type
+namespace lorraine::ast::type::descriptor
 {
-    std::string function_descriptor::to_string() const
+    std::string function::to_string() const
     {
         std::stringstream stream;
 
@@ -15,7 +15,7 @@ namespace lorraine::ast::type
         return stream.str();
     }
 
-    function_descriptor::function_descriptor( type_list arguments, type_list returns )
+    function::function( type_list arguments, type_list returns )
         : arguments( arguments ),
           returns( returns )
     {
