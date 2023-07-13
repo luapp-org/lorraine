@@ -4,6 +4,7 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Type.h>
 
+
 #include <string>
 #include <string_view>
 #include <variant>
@@ -85,7 +86,7 @@ namespace lorraine::ast::type
         /// @brief Converts the current type to a llvm type pointer
         /// @param context LLVM context
         /// @return LLVM type ptr
-        llvm::Type *to_llvm_type( llvm::LLVMContext &context );
+        llvm::Type *to_llvm_type( llvm::LLVMContext &context);
 
         /// @brief Validates the current type. Basically makes sure everything has been legally assigned.
         /// @return True if valid

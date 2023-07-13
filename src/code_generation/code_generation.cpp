@@ -18,7 +18,7 @@ namespace lorraine::code_generation
         const auto type = llvm::FunctionType::get( llvm::Type::getVoidTy( context ), false );
 
         const auto entry_function =
-            llvm::Function::Create( type, llvm::GlobalValue::InternalLinkage, "entry", *llvm_module );
+            llvm::Function::Create( type, llvm::GlobalValue::ExternalLinkage, "main", *llvm_module );
 
         const auto entry_block = llvm::BasicBlock::Create( context, "entry", entry_function );
 

@@ -2,6 +2,7 @@
 
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
+#include <llvm/Support/TargetSelect.h>
 
 #include "../ast/statement.hpp"
 
@@ -16,7 +17,15 @@ namespace lorraine::code_generation
             : llvm_module( std::make_unique< llvm::Module >( ast_module->info->name, context ) ),
               ast_module( ast_module )
         {
+            llvm::InitializeAllTargetInfos();
+            llvm::InitializeAllTargets();
+            llvm::InitializeAllTargetMCs();
+            llvm::InitializeAllAsmParsers();
+            llvm::InitializeAllAsmPrinters();
+
             llvm_module->setSourceFileName( ast_module->info->absolute() );
+
+            context.setOpaquePointers( false );
         }
 
         /// @brief Generates an LLVM module from the AST module

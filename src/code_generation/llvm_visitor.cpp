@@ -18,7 +18,7 @@ namespace lorraine::code_generation
 
     bool llvm_visitor::visit( ast::string_literal* node )
     {
-        value = builder.CreateGlobalString( llvm::StringRef( node->value.c_str() ) );
+        value = builder.CreateGlobalStringPtr( llvm::StringRef( node->value.c_str() ) );
         return false;
     }
 

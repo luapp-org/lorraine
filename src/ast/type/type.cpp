@@ -142,7 +142,7 @@ namespace lorraine::ast::type
                 case primitive_type::number: return llvm::Type::getDoubleTy( context );
                 case primitive_type::void_: return llvm::Type::getVoidTy( context );
                 case primitive_type::boolean: return llvm::Type::getInt1Ty( context );
-                case primitive_type::string: return llvm::Type::getInt8PtrTy( context );
+                case primitive_type::string: return llvm::PointerType::getUnqual( llvm::Type::getInt8Ty( context ) );
 
                 default:
                     throw utils::compiler_error(

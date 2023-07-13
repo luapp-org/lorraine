@@ -26,18 +26,29 @@ namespace lorraine::compiler
 
         const auto main_module = parser.parse();
 
-        if ( main_module )
+        if ( !main_module )
+            return {};
+
+        if ( !ast::type::validator::validate( main_module.get(), this ) )
+            return {};
+
+        code_generation::code_generation gen{ main_module.get() };
+        std::shared_ptr< llvm::Module > main = gen.generate();
+
+        if ( stage == compiler_stage::ir )
         {
-            if ( !ast::type::validator::validate( main_module.get(), this ) )
-                return {};
+            std::string ss;
+            llvm::raw_string_ostream raw( ss );
+            main->print( raw, nullptr );
 
-            code_generation::code_generation gen{ main_module.get() };
-            std::shared_ptr< llvm::Module > main = gen.generate();
-
-            main->print( llvm::errs(), nullptr );
+            return std::stringstream{ ss };
         }
 
-        return {};
+        std::string ss;
+        llvm::raw_string_ostream raw( ss );
+        llvm::WriteBitcodeToFile( *main, raw );
+
+        return std::stringstream{ ss };
     }
 
     void compiler::llvm_display_error(

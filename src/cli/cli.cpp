@@ -75,11 +75,11 @@ namespace lorraine::cli
             std::cout << output;
         else
         {
-            std::ofstream out( output_file );
+            std::ofstream out( output_file, std::ios::binary );
             out << output;
         }
 
-        return 1;
+        return 0;
     }
 
     compiler::compiler_stage cli::get_stage()
