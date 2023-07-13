@@ -227,12 +227,12 @@ namespace lorraine::ast
     /// @brief Represents a type alias definition in the AST. `type' Name = type
     struct type_alias_definition : expression
     {
-        std::string_view name;
+        std::string name;
         std::shared_ptr< ast::type::type > type;
 
         explicit type_alias_definition(
             const utils::location& location,
-            const std::string_view& name,
+            const std::string& name,
             std::shared_ptr< ast::type::type > type )
             : expression( location ),
               name( name ),

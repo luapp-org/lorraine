@@ -16,19 +16,20 @@ namespace lorraine::ast::type
     {
         if ( const auto table = std::get_if< descriptor::table >( &value ) )
         {
-            // Iterate through each property and compare them. If any are not
-            // equal the descriptors are not identical.
-            std::size_t j = 0;
-            for ( std::size_t i = 0; i < t.properties.size(); ++i )
+            // Make sure that all properties in the table are present in the other table.
+            for ( const auto& property : table->properties )
             {
-                if ( !t.properties[ i ].is( table->properties[ j ] ) )
+                if ( const auto other_property = t.get_property( property.name ) )
                 {
-                    if ( t.properties[ i ].is_optional )
-                        continue;
-
-                    return false;
+                    // If we get a property make sure that the types are equal.
+                    if ( !property.is( *other_property ) )
+                        return false;
                 }
-                ++j;
+                else
+                {
+                    if ( !property.is_optional )
+                        return false;
+                }
             }
 
             return true;

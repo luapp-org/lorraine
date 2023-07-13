@@ -1,6 +1,8 @@
 #pragma once
 
+#include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -35,12 +37,16 @@ namespace lorraine::ast::type
                 /// @brief Compares the current table property with another
                 /// @param property Table property
                 /// @return True if equal
-                bool is( table_property property );
+                bool is( table_property property ) const;
             };
 
             /// @brief Returns a string representation of the table descriptor
             /// @return New string representation
             std::string to_string() const;
+
+            /// @brief Gets a property in the table by name
+            /// @return The property
+            std::optional< table_property > get_property( const std::string& name );
 
             std::vector< table_property > properties;
         };

@@ -155,9 +155,7 @@ namespace lorraine::parser
             {
                 std::unique_ptr< ast::type_alias_definition > type_alias = parse_type_alias();
 
-                const auto name = std::string{ type_alias->name.begin(), type_alias->name.end() };
-
-                last_block->export_types.emplace( name, type_alias->type );
+                last_block->export_types.emplace( type_alias->name, type_alias->type );
 
                 return std::make_unique< ast::export_item >(
                     utils::location{ start, lexer.current().location.end }, std::move( type_alias ) );
