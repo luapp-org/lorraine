@@ -63,6 +63,7 @@ namespace lorraine::lexer
         sym_rbrace,    // }
         sym_wiggle,    // ~
         sym_question,  // ?
+        sym_pipe,      // |
 
         // Combinations
         cmb_eq,       // ==
@@ -160,6 +161,7 @@ namespace lorraine::lexer
                 case token_type::sym_rbrace: return "}";
                 case token_type::sym_wiggle: return "~";
                 case token_type::sym_question: return "?";
+                case token_type::sym_pipe: return "|";
 
                 case token_type::cmb_eq: return "==";
                 case token_type::cmb_ge: return ">=";

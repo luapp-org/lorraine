@@ -76,4 +76,21 @@ namespace lorraine::ast
         if ( v->visit( this ) )
             value->visit( v );
     }
+
+    void list_constructor::visit( visitor* v )
+    {
+        if ( v->visit( this ) )
+        {
+            for ( const auto& expr : expressions )
+                expr->visit( v );
+        }
+    }
+
+    void variable_assignment::visit( visitor* v )
+    {
+        if ( v->visit( this ) )
+        {
+            value->visit( v );
+        }
+    }
 }  // namespace lorraine::ast

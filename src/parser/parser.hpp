@@ -44,6 +44,10 @@ namespace lorraine::parser
         std::shared_ptr< ast::type::type > void_type =
             std::make_shared< ast::type::type >( ast::type::type::primitive_type::void_ );
 
+        /// @brief Basic 'nil' type. Variable is defined here for convenience.
+        std::shared_ptr< ast::type::type > nil_type =
+            std::make_shared< ast::type::type >( ast::type::type::primitive_type::nil );
+
         /// @brief Expects the current token to be of a certain type. Acts similarly to `assert`.
         /// @param type The expected type
         /// @param consume Tells the function to consume the following token
@@ -170,5 +174,12 @@ namespace lorraine::parser
         /// @brief Parses a call expression. This can be a call to a function or class constructor.
         /// @return Function call expression
         std::unique_ptr< ast::expression > parse_call_expression( std::unique_ptr< ast::expression > function );
+
+        /// @brief Parses a list constructor. A constructor for array and table initialization.
+        /// @return Constructor
+        std::unique_ptr< ast::expression > parse_list_constructor();
+
+        /// @brief Parses a variable assignment.
+        std::unique_ptr< ast::expression > parse_variable_assignment();
     };
 }  // namespace lorraine::parser

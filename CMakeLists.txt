@@ -25,13 +25,17 @@ add_executable(compiler
             src/lexer/lexer.cpp
             src/cli/cli.cpp
             src/cli/config.cpp
+
             src/ast/expression.cpp
             src/ast/statement.cpp
+
             src/ast/type/type.cpp
             src/ast/type/table_descriptor.cpp
             src/ast/type/function_descriptor.cpp
             src/ast/type/vararg_descriptor.cpp
+            src/ast/type/array_descriptor.cpp
             src/ast/type/validator.cpp
+
             src/parser/parser.cpp
 
             src/code_generation/code_generation.cpp

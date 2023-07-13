@@ -8,7 +8,7 @@ namespace lorraine::ast::type
     bool type::is( primitive_type t )
     {
         if ( const auto prim = std::get_if< primitive_type >( &value ) )
-            t == *prim;
+            return t == *prim;
 
         return false;
     }
@@ -17,14 +17,20 @@ namespace lorraine::ast::type
     {
         if ( const auto table = std::get_if< table_descriptor >( &value ) )
         {
-            if ( table->properties.size() != t.properties.size() )
-                return false;
-
             // Iterate through each property and compare them. If any are not
             // equal the descriptors are not identical.
+            std::size_t j = 0;
             for ( std::size_t i = 0; i < t.properties.size(); ++i )
-                if ( !t.properties[ i ].is( table->properties[ i ] ) )
+            {
+                if ( !t.properties[ i ].is( table->properties[ j ] ) )
+                {
+                    if ( t.properties[ i ].is_optional )
+                        continue;
+
                     return false;
+                }
+                ++j;
+            }
 
             return true;
         }
@@ -64,6 +70,14 @@ namespace lorraine::ast::type
         return false;
     }
 
+    bool type::is( array_descriptor t )
+    {
+        if ( const auto array = std::get_if< array_descriptor >( &value ) )
+            return array->t->is( t.t );
+
+        return false;
+    }
+
     bool type::is( std::shared_ptr< type > t )
     {
         if ( const auto prim = std::get_if< primitive_type >( &t->value ) )
@@ -77,6 +91,9 @@ namespace lorraine::ast::type
 
         if ( const auto vararg = std::get_if< vararg_descriptor >( &t->value ) )
             return is( *vararg );
+
+        if ( const auto array = std::get_if< array_descriptor >( &t->value ) )
+            return is( *array );
 
         return false;
     }
@@ -104,6 +121,9 @@ namespace lorraine::ast::type
         if ( const auto table = std::get_if< table_descriptor >( &value ) )
             return ( *table ).to_string();
 
+        if ( const auto array = std::get_if< array_descriptor >( &value ) )
+            return ( *array ).to_string();
+
         if ( const auto function = std::get_if< function_descriptor >( &value ) )
             return ( *function ).to_string();
 
@@ -129,7 +149,7 @@ namespace lorraine::ast::type
                         "An LLVM Type does not exist for the provided Lua++ primitive '" + to_string() + "'" );
             }
         }
-        if ( const auto func = std::get_if< function_descriptor >( &value ) )
+        else if ( const auto func = std::get_if< function_descriptor >( &value ) )
         {
             llvm::Type *return_type = nullptr;
 
@@ -196,7 +216,7 @@ namespace lorraine::ast::type
             if ( const auto vararg = std::get_if< vararg_descriptor >( &types[ i ]->value ) )
                 if ( i != types.size() - 1 )
                 {
-                    throw utils::syntax_error(location, "vararg must be the last type in a type list");
+                    throw utils::syntax_error( location, "vararg must be the last type in a type list" );
                     return false;
                 }
         }

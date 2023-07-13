@@ -37,6 +37,7 @@ namespace lorraine::ast
         visitor_definition( expression, expression_index );
         visitor_definition( expression, nil_literal );
         visitor_definition( expression, expression_group );
+        visitor_definition( expression, list_constructor );
 
         // Register visitor patterns for statements
         visitor_definition( statement, block );

@@ -1,1 +1,1 @@
-local a: number = "string"
+local a: nil = nil

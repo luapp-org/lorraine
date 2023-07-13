@@ -32,8 +32,9 @@ namespace lorraine::lexer
         void next();
 
         /// @brief Gets the next token without updating the source pointer
+        /// @param count The number of tokens to skip
         /// @return Next token
-        token peek();
+        token peek( std::size_t count = 1 );
 
         /// @brief Dumps all tokens to the console
         /// @returns The output stream the tokens will be sent to
@@ -102,10 +103,10 @@ namespace lorraine::lexer
         };
 
         std::unordered_map< char, token_type > symbol_map = {
-            { '?', token_type::sym_question }, { '{', token_type::sym_lbrace },
-            { '}', token_type::sym_rbrace },   { ':', token_type::sym_colon },
-            { ',', token_type::sym_comma },    { '(', token_type::sym_lparen },
-            { ')', token_type::sym_rparen }
+            { '?', token_type::sym_question }, { '{', token_type::sym_lbrace }, { '}', token_type::sym_rbrace },
+            { ':', token_type::sym_colon },    { ',', token_type::sym_comma },  { '(', token_type::sym_lparen },
+            { ')', token_type::sym_rparen },   { '|', token_type::sym_pipe },   { '[', token_type::sym_lbracket },
+            { ']', token_type::sym_rbracket }
         };
     };
 }  // namespace lorraine::lexer

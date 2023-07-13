@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "../node.hpp"
+#include "array_descriptor.hpp"
 #include "function_descriptor.hpp"
 #include "table_descriptor.hpp"
 #include "vararg_descriptor.hpp"
@@ -31,6 +32,7 @@ namespace lorraine::ast::type
 
             // Non-annotatable types
             nil,
+            unknown,
 
             // Annotatable, but only for function return values
             void_,
@@ -55,6 +57,11 @@ namespace lorraine::ast::type
         /// @param t Vararg descriptor
         /// @return True if equal
         bool is( vararg_descriptor t );
+
+        /// @brief Compares the current type with a given array descriptor
+        /// @param t Vararg descriptor
+        /// @return True if equal
+        bool is( array_descriptor t );
 
         /// @brief Compares the current type with another type
         /// @param t Other type
@@ -88,9 +95,14 @@ namespace lorraine::ast::type
         // @return True if valid
         static bool validate( type_list types, utils::location location );
 
-        std::variant< primitive_type, table_descriptor, function_descriptor, vararg_descriptor > value;
+        std::variant< primitive_type, table_descriptor, function_descriptor, vararg_descriptor, array_descriptor >
+            value;
 
         type( primitive_type t ) : value( t )
+        {
+        }
+
+        type( array_descriptor t ) : value( t )
         {
         }
 

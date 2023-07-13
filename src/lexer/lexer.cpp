@@ -265,6 +265,28 @@ namespace lorraine::lexer
         }
     }
 
+    token lexer::peek( std::size_t count )
+    {
+        // Save the old offsets as we will reset them later
+        const std::size_t old_offset = offset, old_line = line, old_line_offset = line_offset;
+        const token old_token = current();
+
+        for ( std::size_t i = 0; i < count; ++i )
+            next();
+
+        const token t = current();
+
+        // Reset the offsets
+        offset = old_offset;
+        line = old_line;
+        line_offset = old_line_offset;
+
+        // Reset the token
+        this->t = old_token;
+
+        return t;
+    }
+
     void lexer::read_identifier( const utils::position& start )
     {
         const std::size_t start_offset = offset;

@@ -413,6 +413,12 @@ namespace lorraine::parser
 
         switch ( current.type )
         {
+            case lexer::token_type::kw_nil:
+            {
+                lexer.next();
+
+                return nil_type;
+            }
             case lexer::token_type::identifier: return parse_named_type();
             case lexer::token_type::sym_lbrace: return parse_table_type();
             case lexer::token_type::sym_lparen: return parse_function_type();
@@ -492,7 +498,7 @@ namespace lorraine::parser
         while ( lexer.current().type != lexer::token_type::sym_rbrace )
         {
             expect( lexer::token_type::identifier );
-            
+
             const auto value = lexer.current().value;
             const auto name = std::string{ value.begin(), value.end() };
 
@@ -521,6 +527,59 @@ namespace lorraine::parser
         return std::make_shared< ast::type::type >( descriptor );
     }
 
+    std::unique_ptr< ast::expression > parser::parse_list_constructor()
+    {
+        const auto start = lexer.current().location.start;
+
+        expect( lexer::token_type::sym_lbrace, true );
+
+        ast::expression_list expressions;
+        do
+        {
+            if ( expressions.size() )
+                lexer.next();
+
+            // Literally just for convenience. We can have trailing commas.
+            if ( lexer.current().type == lexer::token_type::sym_comma )
+            {
+                lexer.next();
+                break;
+            }
+
+            // If we have an identifier followed by an equals sign, we have a key-value pair
+            if ( lexer.current().type == lexer::token_type::identifier &&
+                 lexer.peek().type == lexer::token_type::sym_equals )
+                expressions.push_back( parse_variable_assignment() );
+            // Otherwise we just have an expression
+            else
+                expressions.push_back( parse_expression() );
+
+        } while ( lexer.current().type == lexer::token_type::sym_comma );
+
+        expect( lexer::token_type::sym_rbrace );
+        const auto end = lexer.current().location.end;
+        lexer.next();
+
+        return std::make_unique< ast::list_constructor >( utils::location{ start, end }, std::move( expressions ) );
+    }
+
+    std::unique_ptr< ast::expression > parser::parse_variable_assignment()
+    {
+        const auto current = lexer.current();
+
+        expect( lexer::token_type::identifier, true );
+        expect( lexer::token_type::sym_equals, true );
+
+        // Create our variable. Set it as any type for now, we will update it later.
+        std::shared_ptr< ast::variable > variable = std::make_shared< ast::variable >(
+            current.location, std::string{ current.value.begin(), current.value.end() }, any_type );
+
+        // Get our expression
+        std::unique_ptr< ast::expression > expression = parse_expression();
+
+        return std::make_unique< ast::variable_assignment >( current.location, variable, std::move( expression ) );
+    }
+
     std::shared_ptr< ast::type::type > parser::parse_named_type()
     {
         expect( lexer::token_type::identifier );
@@ -529,13 +588,31 @@ namespace lorraine::parser
 
         lexer.next();
 
-        if ( const auto type = last_block->get_type( current.value ) )
-            return std::make_shared< ast::type::type >( *type );
+        std::shared_ptr< ast::type::type > type = nullptr;
 
-        std::stringstream msg;
-        msg << "the type '" << current.value << "' does not exist in the current context";
+        if ( const auto ntype = last_block->get_type( current.value ) )
+            type = std::make_shared< ast::type::type >( *ntype );
 
-        throw utils::syntax_error( current.location, msg.str() );
+        // We were unable to located the type, so it doesn't exist.
+        if ( !type )
+        {
+            std::stringstream msg;
+            msg << "the type '" << current.value << "' does not exist in the current context";
+
+            throw utils::syntax_error( current.location, msg.str() );
+        }
+
+        // If we have a '[' following the named type, then we must have an array type;
+        if ( lexer.current().type == lexer::token_type::sym_lbracket )
+        {
+            lexer.next();
+
+            expect( lexer::token_type::sym_rbracket, true );
+
+            return std::make_shared< ast::type::type >( ast::type::array_descriptor{ type } );
+        }
+
+        return type;
     }
 
     void parser::register_primitives( ast::block* block )
@@ -548,6 +625,7 @@ namespace lorraine::parser
         types.emplace( "boolean", std::make_shared< ast::type::type >( ast::type::type::primitive_type::boolean ) );
         types.emplace( "void", std::make_shared< ast::type::type >( ast::type::type::primitive_type::void_ ) );
         types.emplace( "any", std::make_shared< ast::type::type >( ast::type::type::primitive_type::any ) );
+        types.emplace( "nil", nil_type );
     }
 
     std::shared_ptr< ast::variable > parser::parse_variable( bool allow_variadic )
@@ -665,6 +743,10 @@ namespace lorraine::parser
                 lexer.next();
 
                 return std::make_unique< ast::nil_literal >( current.location );
+            }
+            case lexer::token_type::sym_lbrace:
+            {
+                return parse_list_constructor();
             }
 
             default:

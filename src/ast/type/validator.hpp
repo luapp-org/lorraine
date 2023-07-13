@@ -16,8 +16,11 @@ namespace lorraine::ast::type
 
         bool visit( local_assignment *node ) override;
         bool visit( external_decleration *node ) override;
+        bool visit( list_constructor *node ) override;
 
        private:
        compiler::compiler *compiler;
+
+       std::shared_ptr< type > get_primary_type( expression_list expressions );
     };
 }  // namespace lorraine::ast::type

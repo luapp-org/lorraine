@@ -16,6 +16,7 @@ namespace lorraine::code_generation
             : llvm_module( std::make_unique< llvm::Module >( ast_module->info->name, context ) ),
               ast_module( ast_module )
         {
+            llvm_module->setSourceFileName( ast_module->info->absolute() );
         }
 
         /// @brief Generates an LLVM module from the AST module

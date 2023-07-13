@@ -267,4 +267,36 @@ namespace lorraine::ast
         void visit( visitor* v ) override;
     };
 
+    /// @brief List constructor. This constructor is called when initializing an array or table.
+    struct list_constructor : expression
+    {
+        expression_list expressions;
+
+        explicit list_constructor( const utils::location& location, expression_list expressions )
+            : expression( location ),
+              expressions( std::move( expressions ) )
+        {
+        }
+
+        void visit( visitor* v ) override;
+    };
+
+    struct variable_assignment : expression
+    {
+        std::shared_ptr< variable > var;
+        std::unique_ptr< expression > value;
+
+        explicit variable_assignment(
+            const utils::location& location,
+            std::shared_ptr< variable > var,
+            std::unique_ptr< expression > value )
+            : expression( location ),
+              var( std::move( var ) ),
+              value( std::move( value ) )
+        {
+        }
+
+        void visit( visitor* v ) override;
+    };
+
 }  // namespace lorraine::ast
