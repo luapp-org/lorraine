@@ -1,5 +1,6 @@
 #include "statement.hpp"
 
+#include <filesystem>
 #include <iostream>
 
 #include "visitor.hpp"
@@ -142,14 +143,24 @@ namespace lorraine::ast
 
     std::shared_ptr< module::information > module::get_information(
         std::shared_ptr< information > relative,
-        const std::string& name )
+        std::string name )
     {
         std::shared_ptr< module::information > info = std::make_shared< module::information >();
 
         // TODO: Add support for packages. These will just be referenced by their names not './' or
         // '../'
         if ( name[ 0 ] != '.' )
-            return nullptr;
+        {
+            auto path = std::filesystem::canonical( "/proc/self/exe" ).string();
+
+            const std::size_t last_slash = name.find_last_of( "/\\" ) + 1;
+            const auto file_directory = name.substr( 0, last_slash );
+
+            info->directory = path.substr( 0, path.find_last_of( "/\\" ) + 1 );
+            info->name = name;
+            info->filename = info->name + ".lua";
+            return info;
+        }
 
         const std::size_t last_slash = name.find_last_of( "/\\" ) + 1;
         const auto file_directory = name.substr( 0, last_slash );
@@ -162,6 +173,11 @@ namespace lorraine::ast
     }
 
     void external_decleration::visit( visitor* v )
+    {
+        v->visit( this );
+    }
+
+    void interface_definition::visit( visitor* v )
     {
         v->visit( this );
     }

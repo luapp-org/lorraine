@@ -99,6 +99,7 @@ namespace lorraine::lexer
             { "export", token_type::kw_export },
             { "from", token_type::kw_from },
             { "extern", token_type::kw_extern },
+            { "interface", token_type::kw_interface },
             { "while", token_type::kw_while },
         };
 

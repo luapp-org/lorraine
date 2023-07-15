@@ -62,6 +62,7 @@ namespace lorraine::parser
             case lexer::token_type::kw_import: return parse_import();
             case lexer::token_type::kw_export: return parse_export();
             case lexer::token_type::kw_extern: return parse_extern();
+            case lexer::token_type::kw_interface: return parse_interface_definition();
 
             default:
             {
@@ -78,6 +79,88 @@ namespace lorraine::parser
         }
 
         return nullptr;
+    }
+
+    std::unique_ptr< ast::interface_definition > parser::parse_interface_definition()
+    {
+        const auto start = lexer.current().location.start;
+        expect( lexer::token_type::kw_interface, true );
+
+        // Get interface name and consume next token
+        expect( lexer::token_type::identifier );
+        const auto name = lexer.current();
+        lexer.next();
+
+        // Do we have generics? If so parse them
+        ast::type::generic_list generics;
+        if ( lexer.current().type == lexer::token_type::sym_l )
+        {
+            lexer.next();
+
+            auto identifiers = parse_identifier_list();
+
+            // Register all of the generic types
+            for ( const auto identifier : identifiers )
+                generics.emplace_back( identifier.value );
+
+            expect( lexer::token_type::sym_g, true );
+        }
+
+        expect( lexer::token_type::sym_lbrace, true );
+
+        // Create our interface descriptor
+        ast::type::descriptor::interface interface {
+            name.value, generics
+        };
+
+        // TODO: Move this into a function, something like parse_member_list()
+        // Parse all members of the interface
+        while ( lexer.current().type != lexer::token_type::sym_rbrace )
+        {
+            switch ( lexer.current().type )
+            {
+                case lexer::token_type::kw_function:
+                {
+                    expect( lexer::token_type::kw_function, true );
+
+                    std::unique_ptr< ast::function_prototype > function = parse_function_prototype();
+
+                    interface.properties.emplace_back( function->name, function->type, false );
+                    break;
+                }
+                case lexer::token_type::identifier:
+                {
+                    expect( lexer::token_type::identifier );
+
+                    const auto value = lexer.current().value;
+                    lexer.next();
+
+                    bool is_optional = false;
+
+                    if ( lexer.current().type == lexer::token_type::sym_question )
+                    {
+                        is_optional = true;
+                        lexer.next();
+                    }
+
+                    expect( lexer::token_type::sym_colon, true );
+
+                    std::shared_ptr< ast::type::type > type = parse_named_type();
+
+                    interface.properties.emplace_back( value, type, is_optional );
+                    break;
+                }
+            }
+        }
+
+        // Save the location and consume the closing bracket
+        const auto end = lexer.current().location.end;
+        expect( lexer::token_type::sym_rbrace, true );
+
+        std::shared_ptr< ast::type::type > type = std::make_shared< ast::type::type >( interface );
+        last_block->export_types.emplace( name.value, type );
+
+        return std::make_unique< ast::interface_definition >( utils::location{ start, end }, type );
     }
 
     std::unique_ptr< ast::import > parser::parse_import()
@@ -270,16 +353,23 @@ namespace lorraine::parser
 
         lexer.next();
 
+        ast::type::type_list arguments, returns;
+        ast::variable_list variable_list;
+
         expect( lexer::token_type::sym_lparen, true );
 
-        const auto variable_list = parse_variable_list( true );
+        if ( lexer.current().type != lexer::token_type::sym_rparen )
+        {
+            variable_list = parse_variable_list( true );
 
-        expect( lexer::token_type::sym_rparen, true );
+            expect( lexer::token_type::sym_rparen, true );
 
-        ast::type::type_list arguments = get_type_list( variable_list );
-        ast::type::type_list returns;
+            arguments = get_type_list( variable_list );
+        }
+        else
+            expect( lexer::token_type::sym_rparen, true );
 
-        // Check if there is an annotation for the main prototype
+        // Check if there is and annotation for the main prototype
         if ( lexer.current().type == lexer::token_type::sym_colon )
         {
             lexer.next();
@@ -318,10 +408,9 @@ namespace lorraine::parser
         return identifiers;
     }
 
-    std::unique_ptr< ast::module > parser::get_module( const utils::location& loc, const std::string_view& name )
+    std::unique_ptr< ast::module > parser::get_module( const utils::location& loc, const std::string& name )
     {
-        std::shared_ptr< ast::module::information > info =
-            ast::module::get_information( this->info, std::string{ name.begin(), name.end() } );
+        std::shared_ptr< ast::module::information > info = ast::module::get_information( this->info, name );
 
         if ( !info )
             throw utils::syntax_error( loc, "There was an issue parsing the module name. Use './' for local files." );
@@ -340,7 +429,7 @@ namespace lorraine::parser
         // Set the source of the module
         info->source = source.value();
 
-        parser parser{ info->absolute(), *source, compiler };
+        parser parser{ info, *source, compiler };
 
         return parser.parse();
     }
@@ -498,8 +587,6 @@ namespace lorraine::parser
             expect( lexer::token_type::identifier );
 
             const auto value = lexer.current().value;
-            const auto name = std::string{ value.begin(), value.end() };
-
             lexer.next();
 
             bool is_optional = false;
@@ -514,7 +601,7 @@ namespace lorraine::parser
 
             std::shared_ptr< ast::type::type > type = parse_named_type();
 
-            descriptor.properties.emplace_back( name, type, is_optional );
+            descriptor.properties.emplace_back( value, type, is_optional );
 
             if ( lexer.current().type == lexer::token_type::sym_comma )
                 lexer.next();
@@ -583,7 +670,6 @@ namespace lorraine::parser
         expect( lexer::token_type::identifier );
 
         const auto current = lexer.current();
-
         lexer.next();
 
         std::shared_ptr< ast::type::type > type = nullptr;
@@ -624,6 +710,32 @@ namespace lorraine::parser
         types.emplace( "void", std::make_shared< ast::type::type >( ast::type::type::primitive_type::void_ ) );
         types.emplace( "any", std::make_shared< ast::type::type >( ast::type::type::primitive_type::any ) );
         types.emplace( "nil", nil_type );
+
+        // Add the array type. It is an interface with one generic type.
+        register_array_interface( block );
+    }
+
+    void parser::register_array_interface( ast::block* block )
+    {
+        // Don't register the array interface in the actual module.
+        if ( info->name == "types/array" )
+            return;
+
+        // Note: doing this so that the formatter doesn't multiline
+        auto& types = block->types;
+
+        // Add the array type. It is an interface with one generic type.
+        std::shared_ptr< ast::module > array_module = get_module( utils::location{}, "types/array" );
+
+        if ( const auto array = array_module->body->get_export_type( "Array" ) )
+            types.emplace( "Array", array );
+        else
+        {
+            std::stringstream msg;
+            msg << "the type 'Array' does not exist in the module 'types/array'";
+
+            throw utils::syntax_error( utils::location{}, msg.str() );
+        }
     }
 
     std::shared_ptr< ast::variable > parser::parse_variable( bool allow_variadic )

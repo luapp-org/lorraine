@@ -372,7 +372,7 @@ namespace lorraine::lexer
                     utils::location{ start, current_position() }, "unfinished long comment near <eof>" );
         }
 
-        while ( ( peek_character() != '\n' || peek_character() != '\r' ) && peek_character() != WEOF )
+        while ( peek_character() != '\n' && peek_character() != '\r' && peek_character() != EOF )
             consume_character();
     }
     void lexer::read_string( const utils::position& start )
@@ -457,7 +457,7 @@ namespace lorraine::lexer
         const std::size_t delim_count = skip_long_delim();
         const std::size_t start_offset = offset;
 
-        while ( peek_character() != WEOF )
+        while ( peek_character() != EOF )
         {
             // Find first closing ']'
             if ( peek_character() == ']' )

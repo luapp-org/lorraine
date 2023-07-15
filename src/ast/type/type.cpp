@@ -12,12 +12,20 @@ namespace lorraine::ast::type
         return false;
     }
 
+    bool type::is( generic t )
+    {
+        if ( const auto gen = std::get_if< generic >( &value ) )
+            return t.name == gen->name;
+
+        return false;
+    }
+
     bool type::is( descriptor::table t )
     {
         if ( const auto table = std::get_if< descriptor::table >( &value ) )
         {
             // Make sure that all properties in the table are present in the other table.
-            for ( const auto& property : table->properties )
+            for ( const auto &property : table->properties )
             {
                 if ( const auto other_property = t.get_property( property.name ) )
                 {
@@ -78,10 +86,29 @@ namespace lorraine::ast::type
         return false;
     }
 
+    bool type::is( descriptor::interface t )
+    {
+        if ( const auto interface = std::get_if< descriptor::interface >( &value ) )
+        {
+            if ( interface->name != t.name )
+                return false;
+
+            if ( interface->generics.size() != t.generics.size() )
+                return false;
+
+            return true;
+        }
+
+        return false;
+    }
+
     bool type::is( std::shared_ptr< type > t )
     {
         if ( const auto prim = std::get_if< primitive_type >( &t->value ) )
             return is( *prim );
+
+        if ( const auto gen = std::get_if< generic >( &t->value ) )
+            return is( *gen );
 
         if ( const auto table = std::get_if< descriptor::table >( &t->value ) )
             return is( *table );
@@ -94,6 +121,9 @@ namespace lorraine::ast::type
 
         if ( const auto array = std::get_if< descriptor::array >( &t->value ) )
             return is( *array );
+
+        if ( const auto interface = std::get_if< descriptor::interface >( &t->value ) )
+            return is( *interface );
 
         return false;
     }
@@ -118,6 +148,9 @@ namespace lorraine::ast::type
         if ( const auto prim = std::get_if< primitive_type >( &value ) )
             return type::to_string( *prim );
 
+        if ( const auto gen = std::get_if< generic >( &value ) )
+            return gen->to_string();
+
         if ( const auto table = std::get_if< descriptor::table >( &value ) )
             return ( *table ).to_string();
 
@@ -129,6 +162,9 @@ namespace lorraine::ast::type
 
         if ( const auto vararg = std::get_if< descriptor::vararg >( &value ) )
             return ( *vararg ).to_string();
+
+        if ( const auto interface = std::get_if< descriptor::interface >( &value ) )
+            return ( *interface ).to_string();
 
         return "unknown";
     }

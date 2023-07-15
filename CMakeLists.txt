@@ -34,6 +34,7 @@ add_executable(compiler
             src/ast/type/descriptor/function.cpp
             src/ast/type/descriptor/vararg.cpp
             src/ast/type/descriptor/array.cpp
+            src/ast/type/descriptor/interface.cpp
             src/ast/type/validator.cpp
 
             src/parser/parser.cpp

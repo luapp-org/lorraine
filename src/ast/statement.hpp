@@ -125,7 +125,7 @@ namespace lorraine::ast
 
         static std::shared_ptr< information > get_information(
             std::shared_ptr< information > relative,
-            const std::string& name );
+            std::string name );
 
         void visit( visitor* v ) override;
     };
@@ -155,6 +155,19 @@ namespace lorraine::ast
         explicit external_decleration( const utils::location& location, std::shared_ptr< variable > var )
             : statement( location ),
               var( var )
+        {
+        }
+
+        void visit( visitor* v ) override;
+    };
+
+    struct interface_definition : statement
+    {
+        std::shared_ptr< type::type > type;
+
+        explicit interface_definition( const utils::location& location, std::shared_ptr< type::type > type )
+            : statement( location ),
+              type( type )
         {
         }
 

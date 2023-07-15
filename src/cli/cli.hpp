@@ -3,6 +3,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <filesystem>
 
 #include "../compiler/compiler.hpp"
 #include "../utils/CLI11.hpp"

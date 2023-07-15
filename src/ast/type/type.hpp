@@ -12,12 +12,16 @@
 #include "../node.hpp"
 #include "descriptor/array.hpp"
 #include "descriptor/function.hpp"
+#include "descriptor/interface.hpp"
 #include "descriptor/table.hpp"
 #include "descriptor/vararg.hpp"
+#include "generic.hpp"
 
 namespace lorraine::ast::type
 {
     using type_list = std::vector< std::shared_ptr< type > >;
+
+    using generic_list = std::vector< generic >;
 
     struct type
     {
@@ -29,9 +33,9 @@ namespace lorraine::ast::type
             number,
             boolean,
             any,
+            nil,
 
             // Non-annotatable types
-            nil,
             unknown,
 
             // Annotatable, but only for function return values
@@ -42,6 +46,11 @@ namespace lorraine::ast::type
         /// @param t Primitive
         /// @return True if equal
         bool is( primitive_type t );
+
+        /// @brief Compares the current type with a given generic type
+        /// @param t Generic
+        /// @return True if equal
+        bool is( generic t );
 
         /// @brief Compares the current type with a given table descriptor
         /// @param t Table descriptor
@@ -62,6 +71,11 @@ namespace lorraine::ast::type
         /// @param t Vararg descriptor
         /// @return True if equal
         bool is( descriptor::array t );
+
+        /// @brief Compares the current type with a given interface descriptor
+        /// @param t Interface descriptor
+        /// @return True if equal
+        bool is( descriptor::interface t );
 
         /// @brief Compares the current type with another type
         /// @param t Other type
@@ -95,10 +109,21 @@ namespace lorraine::ast::type
         // @return True if valid
         static bool validate( type_list types, utils::location location );
 
-        std::variant< primitive_type, descriptor::table, descriptor::function, descriptor::vararg, descriptor::array >
+        std::variant<
+            primitive_type,
+            generic,
+            descriptor::table,
+            descriptor::function,
+            descriptor::vararg,
+            descriptor::array,
+            descriptor::interface >
             value;
 
         type( primitive_type t ) : value( t )
+        {
+        }
+
+        type( generic t ) : value( t )
         {
         }
 
@@ -115,6 +140,10 @@ namespace lorraine::ast::type
         }
 
         type( descriptor::vararg t ) : value( t )
+        {
+        }
+
+        type( descriptor::interface t ) : value( t )
         {
         }
 

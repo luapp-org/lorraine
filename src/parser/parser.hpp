@@ -19,6 +19,18 @@ namespace lorraine::parser
             info = ast::module::information::get( name, source );
         }
 
+        /// @brief Initializes a new parser class instance
+        explicit parser(
+            std::shared_ptr< ast::module::information > info,
+            const std::string_view& source,
+            compiler::compiler* compiler )
+            : source( source ),
+              lexer( source, compiler ),
+              compiler( compiler ),
+              info( info )
+        {
+        }
+
         /// @brief Parses the source code into an abstract syntax tree
         /// @return A new block
         std::unique_ptr< ast::module > parse();
@@ -57,7 +69,7 @@ namespace lorraine::parser
         /// @param loc The location of the import statement invoking this function
         /// @param name The module name
         /// @return The new module
-        std::unique_ptr< ast::module > get_module( const utils::location& loc, const std::string_view& name );
+        std::unique_ptr< ast::module > get_module( const utils::location& loc, const std::string& name );
 
         /// @brief Creates a type list from the types referenced in an expression list
         /// @param expressions The expression list
@@ -76,6 +88,10 @@ namespace lorraine::parser
         /// @brief Registers all primitive types to a block
         /// @param block Our block
         void register_primitives( ast::block* block );
+
+        /// @brief Registers array interface into the current block
+        /// @param block  Our block
+        void register_array_interface( ast::block* block );
 
         /// @brief Parses a statement while making sure grammar is correct
         /// @return A new AST statement
@@ -181,5 +197,9 @@ namespace lorraine::parser
 
         /// @brief Parses a variable assignment.
         std::unique_ptr< ast::expression > parse_variable_assignment();
+
+        /// @brief Parse interface definition.
+        /// @return Interface definition
+        std::unique_ptr< ast::interface_definition > parse_interface_definition();
     };
 }  // namespace lorraine::parser

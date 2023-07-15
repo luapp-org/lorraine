@@ -47,5 +47,6 @@ namespace lorraine::ast
         visitor_definition( statement, module );
         visitor_definition( statement, import );
         visitor_definition( statement, external_decleration );
+        visitor_definition( statement, interface_definition );
     };
 }  // namespace lorraine::ast
