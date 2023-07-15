@@ -1,8 +1,8 @@
 #include "statement.hpp"
 
-#include <filesystem>
 #include <iostream>
 
+#include "../utils/utils.hpp"
 #include "visitor.hpp"
 
 namespace lorraine::ast
@@ -125,12 +125,11 @@ namespace lorraine::ast
         }
         else
         {
-            const std::size_t last_slash = path.find_last_of( "/\\" ) + 1;
-            const std::size_t last_period = path.find_last_of( ".\\" );
+            std::filesystem::path current = utils::system::get_working_dir();
 
-            info->directory = path.substr( 0, last_slash );
-            info->filename = path.substr( last_slash, path.size() - last_slash );
-            info->name = path.substr( last_slash, last_period - last_slash );
+            info->filename = path;
+            info->name = std::filesystem::path{ info->filename }.replace_extension( "" );
+            info->directory = current.string() + "/";
         }
 
         return info;
@@ -147,27 +146,12 @@ namespace lorraine::ast
     {
         std::shared_ptr< module::information > info = std::make_shared< module::information >();
 
-        // TODO: Add support for packages. These will just be referenced by their names not './' or
-        // '../'
-        if ( name[ 0 ] != '.' )
-        {
-            auto path = std::filesystem::canonical( "/proc/self/exe" ).string();
+        // Absolute path to our module
+        std::filesystem::path absolute = utils::system::get_source_dir().append( name + ".lua" );
 
-            const std::size_t last_slash = name.find_last_of( "/\\" ) + 1;
-            const auto file_directory = name.substr( 0, last_slash );
-
-            info->directory = path.substr( 0, path.find_last_of( "/\\" ) + 1 );
-            info->name = name;
-            info->filename = info->name + ".lua";
-            return info;
-        }
-
-        const std::size_t last_slash = name.find_last_of( "/\\" ) + 1;
-        const auto file_directory = name.substr( 0, last_slash );
-
-        info->directory = relative->directory + ( file_directory == "./" ? "" : file_directory );
-        info->name = name.substr( last_slash, name.size() - last_slash );
-        info->filename = info->name + ".lua";
+        info->name = name;
+        info->filename = absolute.filename();
+        info->directory = absolute.remove_filename();
 
         return info;
     }

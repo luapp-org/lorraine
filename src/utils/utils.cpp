@@ -9,7 +9,7 @@ namespace lorraine::utils
 
         std::ifstream input( filename );
 
-        if (input.fail())
+        if ( input.fail() )
             return std::nullopt;
 
         std::stringstream wss;
@@ -30,5 +30,16 @@ namespace lorraine::utils
     {
         const auto found = path.find_last_of( "/\\" );
         return path.substr( 0, found ) + '/';
+    }
+
+    std::filesystem::path system::get_source_dir()
+    {
+        std::filesystem::path compiler_path = std::filesystem::canonical( "/proc/self/exe" );
+        return compiler_path.remove_filename();
+    }
+
+    std::filesystem::path system::get_working_dir()
+    {
+        return std::filesystem::current_path();
     }
 }  // namespace lorraine::utils
