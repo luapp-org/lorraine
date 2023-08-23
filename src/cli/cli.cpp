@@ -29,6 +29,11 @@ namespace lorraine::cli
             "--elapsedTime",
             cfg.get< bool >( "elapsedTime" ),
             "Prints the elapsed time it took for a stage to complete." );
+        
+        app.add_flag(
+            "--pathToTypeDefinitions",
+            cfg.get< std::string >( "pathToTypeDefinitions" ),
+            "Sets the path to the type definitions directory." );
 
         app.callback( [ & ]() { callback(); } );
     }

@@ -717,22 +717,24 @@ namespace lorraine::parser
 
     void parser::register_array_interface( ast::block* block )
     {
+        const auto array_module_name = compiler->cfg.get< std::string >( "pathToTypeDefinitions" ) + "/array";
+
         // Don't register the array interface in the actual module.
-        if ( info->name == "types/array" )
+        if ( info->name == array_module_name )
             return;
 
         // Note: doing this so that the formatter doesn't multiline
         auto& types = block->types;
 
         // Add the array type. It is an interface with one generic type.
-        std::shared_ptr< ast::module > array_module = get_module( utils::location{}, "types/array" );
+        std::shared_ptr< ast::module > array_module = get_module( utils::location{}, array_module_name );
 
         if ( const auto array = array_module->body->get_export_type( "Array" ) )
             types.emplace( "Array", array );
         else
         {
             std::stringstream msg;
-            msg << "the type 'Array' does not exist in the module 'types/array'";
+            msg << "the type 'Array' does not exist in the module '" << array_module_name << "'";
 
             throw utils::syntax_error( utils::location{}, msg.str() );
         }

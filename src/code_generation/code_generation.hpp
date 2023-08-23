@@ -24,8 +24,6 @@ namespace lorraine::code_generation
             llvm::InitializeAllAsmPrinters();
 
             llvm_module->setSourceFileName( ast_module->info->absolute() );
-
-            context.setOpaquePointers( false );
         }
 
         /// @brief Generates an LLVM module from the AST module

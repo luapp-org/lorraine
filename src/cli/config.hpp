@@ -55,7 +55,8 @@ namespace lorraine::cli
 
             // Compiler flags (affect behavior of language)
             { "imbalancedLocalAssignments", option_value{ true } },
-            { "allowTypelessFunctions", option_value{ false } }
+            { "allowTypelessFunctions", option_value{ false } },
+            { "pathToTypeDefinitions", option_value{ "types" } }
         };
     };
 }  // namespace lorraine::cli
