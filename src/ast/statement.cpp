@@ -125,11 +125,11 @@ namespace lorraine::ast
         }
         else
         {
-            std::filesystem::path current = utils::system::get_working_dir();
+            std::filesystem::path current = utils::system::get_working_dir().append( path );
 
-            info->filename = path;
-            info->name = std::filesystem::path{ info->filename }.replace_extension( "" );
-            info->directory = current.string() + "/";
+            info->filename = current.filename();
+            info->name = std::filesystem::path{ path }.replace_extension( "" );
+            info->directory = current.remove_filename();
         }
 
         return info;
@@ -147,12 +147,25 @@ namespace lorraine::ast
         std::shared_ptr< module::information > info = std::make_shared< module::information >();
 
         // Absolute path to our module
-        std::filesystem::path absolute = utils::system::get_source_dir().append( name + ".lua" );
+        std::filesystem::path absolute;
 
-        info->name = name;
+        // If the name starts with '*' we can replace it with the path of the compiler.
+        if ( name.at( 0 ) == '*' )
+        {
+            // Remove the first character of `name` as we don't need the * anymore
+            name.erase( 0, 1 );
+            
+            absolute = utils::system::get_source_dir();
+        }
+        else
+            absolute = std::filesystem::path( relative->directory );
+
+        absolute = absolute.append( name + ".lua" );
+
+        info->name = "*" + name;
         info->filename = absolute.filename();
         info->directory = absolute.remove_filename();
-
+        
         return info;
     }
 

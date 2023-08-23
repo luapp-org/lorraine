@@ -6,3 +6,5 @@ local a: MyType = {
 }
 
 local array: number[] = { 1, 2, 3 }
+
+local array2: Array<number> = { 1, 2, 3 }

@@ -428,7 +428,7 @@ namespace lorraine::parser
 
         // Set the source of the module
         info->source = source.value();
-
+            
         parser parser{ info, *source, compiler };
 
         return parser.parse();
@@ -718,7 +718,7 @@ namespace lorraine::parser
     void parser::register_array_interface( ast::block* block )
     {
         const auto array_module_name = compiler->cfg.get< std::string >( "pathToTypeDefinitions" ) + "/array";
-
+        
         // Don't register the array interface in the actual module.
         if ( info->name == array_module_name )
             return;
@@ -728,7 +728,7 @@ namespace lorraine::parser
 
         // Add the array type. It is an interface with one generic type.
         std::shared_ptr< ast::module > array_module = get_module( utils::location{}, array_module_name );
-
+        
         if ( const auto array = array_module->body->get_export_type( "Array" ) )
             types.emplace( "Array", array );
         else
