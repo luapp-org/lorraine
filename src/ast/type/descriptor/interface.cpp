@@ -15,10 +15,15 @@ namespace lorraine::ast::type::descriptor
     {
         std::stringstream ss;
         ss << name << "<";
-        for ( const auto& generic : generics )
+
+        for ( std::size_t i = 0; i < generics.size(); ++i )
         {
-            ss << generic.to_string() << ", ";
+            if (i > 0)
+                ss << ", ";
+
+            ss << generics[i].to_string();
         }
+        
         ss << ">";
         return ss.str();
     }
