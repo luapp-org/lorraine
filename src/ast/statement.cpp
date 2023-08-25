@@ -26,10 +26,12 @@ namespace lorraine::ast
         const auto it = types.find( name );
 
         if ( it == types.end() )
+        {
             if ( parent )
                 return parent->get_type( name );
-            else
-                return nullptr;
+
+            return nullptr;
+        }
 
         return it->second;
     }
@@ -88,10 +90,12 @@ namespace lorraine::ast
         const auto it = variables.find( name );
 
         if ( it == variables.end() )
+        {
             if ( parent )
                 return parent->get_variable_type( name );
-            else
-                return nullptr;
+
+            return nullptr;
+        }
 
         return it->second;
     }
@@ -154,7 +158,7 @@ namespace lorraine::ast
         {
             // Remove the first character of `name` as we don't need the * anymore
             name.erase( 0, 1 );
-            
+
             absolute = utils::system::get_source_dir();
         }
         else
@@ -165,7 +169,7 @@ namespace lorraine::ast
         info->name = "*" + name;
         info->filename = absolute.filename();
         info->directory = absolute.remove_filename();
-        
+
         return info;
     }
 
