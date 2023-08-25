@@ -3,6 +3,8 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17) # C++ 17 must be installed
 
+add_compile_options(-Wno-switch)
+
 set(SRC_DIR "src")
 
 project(Lorraine)
@@ -30,6 +32,7 @@ add_executable(compiler
             src/ast/statement.cpp
 
             src/ast/type/type.cpp
+            src/ast/type/generic.cpp
             src/ast/type/descriptor/table.cpp
             src/ast/type/descriptor/function.cpp
             src/ast/type/descriptor/vararg.cpp
