@@ -211,7 +211,7 @@ namespace lorraine::ast::type
             {
                 // We have already validated that '...' is the last type in a type list so if we encounter a vararg, we
                 // can just set the flag and return.
-                if ( is_vararg = std::get_if< descriptor::vararg >( &arg->value ) != nullptr )
+                if ( ( is_vararg = std::get_if< descriptor::vararg >( &arg->value ) != nullptr ) )
                     break;
 
                 const auto arg_type = arg->to_llvm_type( context );
