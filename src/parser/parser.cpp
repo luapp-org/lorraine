@@ -428,7 +428,7 @@ namespace lorraine::parser
 
         // Set the source of the module
         info->source = source.value();
-            
+
         parser parser{ info, *source, compiler };
 
         return parser.parse();
@@ -675,7 +675,47 @@ namespace lorraine::parser
         std::shared_ptr< ast::type::type > type = nullptr;
 
         if ( const auto ntype = last_block->get_type( current.value ) )
-            type = std::make_shared< ast::type::type >( *ntype );
+        {
+            // If `ntype` is an interface type we need to handle possible generic types
+            if ( const auto interface = std::get_if< ast::type::descriptor::interface >( &ntype->value ) )
+            {
+                ast::type::type_list types;
+
+                // If we have generics, we need to parse them
+                if ( lexer.current().type == lexer::token_type::sym_l )
+                {
+                    lexer.next();
+
+                    types = parse_type_list();
+
+                    expect( lexer::token_type::sym_g, true );
+                }
+
+                // If our interface requires generic types and none were provided, we need to throw an exception
+                if ( ( interface->generics.size() && !types.size() ) || ( types.size() != interface->generics.size() ) )
+                {
+                    std::stringstream msg;
+                    msg << "the interface '" << current.value << "' requires " << interface->generics.size()
+                        << " generic types";
+
+                    throw utils::syntax_error( current.location, msg.str() );
+                }
+
+                // If we have generic types, we need to create a new interface type with the generic types
+                if ( types.size() )
+                {
+                    ast::type::descriptor::interface new_interface = *interface;
+
+                    for ( std::size_t i = 0; i < types.size(); i++ )
+                        new_interface.generics.at(i).t = types.at(i);
+
+                    type = std::make_shared< ast::type::type >( new_interface );
+                }
+            }
+
+            if ( !type )
+                type = std::make_shared< ast::type::type >( *ntype );
+        }
 
         // We were unable to located the type, so it doesn't exist.
         if ( !type )
@@ -718,7 +758,7 @@ namespace lorraine::parser
     void parser::register_array_interface( ast::block* block )
     {
         const auto array_module_name = compiler->cfg.get< std::string >( "pathToTypeDefinitions" ) + "/array";
-        
+
         // Don't register the array interface in the actual module.
         if ( info->name == array_module_name )
             return;
@@ -728,7 +768,7 @@ namespace lorraine::parser
 
         // Add the array type. It is an interface with one generic type.
         std::shared_ptr< ast::module > array_module = get_module( utils::location{}, array_module_name );
-        
+
         if ( const auto array = array_module->body->get_export_type( "Array" ) )
             types.emplace( "Array", array );
         else
